@@ -14,12 +14,21 @@
 #' @param initial_weights_sd 
 #' @param momentum 
 #' @param dropout 
+#' @param dropout_pct
 #' @param retx whether to return the RBM predictions for the input data
 #' @param verbose 
 #' @param activation_function function to convert hidden activations (-Inf, Inf) to hidden probabilities [0, 1].  Must be able to operate on sparse "Matrix" objects.
 #' @param ... not used
 #' @export
 #' @return a RBM object
+#' @references
+#' http://blog.echen.me/2011/07/18/introduction-to-restricted-boltzmann-machines/
+#' https://github.com/echen/restricted-boltzmann-machines
+#' http://alandgraf.blogspot.com/2013/01/restricted-boltzmann-machines-in-r.html
+#' http://web.info.uvt.ro/~dzaharie/cne2013/proiecte/tehnici/DeepLearning/DL_tutorialSlides.pdf
+#' http://deeplearning.net/tutorial/rbm.html
+#' http://www.cs.toronto.edu/~hinton/absps/guideTR.pdf
+#' http://www.cs.toronto.edu/~nitish/msc_thesis.pdf
 #' @examples
 #' #Setup a dataset
 #' set.seed(10)
@@ -50,7 +59,7 @@
 #' #Predict for existing data
 #' predict(PCA)
 #' predict(RBM, type='probs')
-rbm <- function (x, num_hidden = 2, max_epochs = 1000, learning_rate = 0.1, use_mini_batches = FALSE, batch_size = 250, initial_weights_mean = 0, initial_weights_sd = 0.1, momentum = 0, dropout = FALSE, retx = FALSE, activation_function=NULL, verbose = FALSE, ...) {
+rbm <- function (x, num_hidden = 2, max_epochs = 1000, learning_rate = 0.1, use_mini_batches = FALSE, batch_size = 250, initial_weights_mean = 0, initial_weights_sd = 0.1, momentum = 0, dropout = FALSE, dropout_pct = .50, retx = FALSE, activation_function = NULL, verbose = FALSE, ...) {
   require('Matrix')
   #stop('not implemented')
   
@@ -75,6 +84,9 @@ rbm <- function (x, num_hidden = 2, max_epochs = 1000, learning_rate = 0.1, use_
   stopifnot(is.numeric(momentum))
   stopifnot(momentum >= 0 & momentum <=1)
   
+  stopifnot(is.numeric(dropout_pct))
+  stopifnot(dropout_pct >= 0 & dropout_pct <1)
+  
   if(momentum>0){warning('Momentum > 0 not yet implemented.  Ignoring momentum')}
   if(dropout){warning('Dropout not yet implemented')}
   
@@ -94,6 +106,7 @@ rbm <- function (x, num_hidden = 2, max_epochs = 1000, learning_rate = 0.1, use_
   # Insert bias units of 1 into the first column.
   x <- cBind(Bias_Unit=rep(1, nrow(x)), x)
   dimnames(weights) = list(colnames(x), c('Bias_Unit', paste('Hidden', 1:num_hidden, sep='_')))
+  w = weights
   
   #Fit the model
   for (epoch in 1:max_epochs){
@@ -105,15 +118,18 @@ rbm <- function (x, num_hidden = 2, max_epochs = 1000, learning_rate = 0.1, use_
     } else {
       x_sample = x
     }
-
-    #Dropout some weights
-    w = weights
-    if(dropout){
-    }
     
     # Clamp to the data and sample from the hidden units. 
     # (This is the "positive CD phase", aka the reality phase.)
-    pos_hidden_activations = x_sample %*% w
+    if(dropout){
+      pos_hidden_activations = x_sample %*% (w * (1+dropout_pct))
+      pos_hidden_activations_dropped <- pos_hidden_activations
+      pos_hidden_activations_dropped@x[runif(length(pos_hidden_activations_dropped@x)) < dropout_pct] = 0
+      pos_hidden_activations_dropped[,1] <- pos_hidden_activations[,1]
+      pos_hidden_activations <- pos_hidden_activations_dropped
+    } else{
+      pos_hidden_activations = x_sample %*% w
+    }
     pos_hidden_probs = activation_function(pos_hidden_activations)
     pos_hidden_states = pos_hidden_probs > Matrix(runif(nrow(x_sample)*(num_hidden+1)), nrow=nrow(x_sample), ncol=(num_hidden+1))
     
