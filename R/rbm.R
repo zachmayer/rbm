@@ -116,14 +116,9 @@ rbm <- function (x, num_hidden = 2, max_epochs = 1000, learning_rate = 0.1, use_
       x_sample = x
     }
 
-    #Dropout some weights
-    w = weights
-    if(dropout){
-    }
-    
     # Clamp to the data and sample from the hidden units. 
     # (This is the "positive CD phase", aka the reality phase.)
-    pos_hidden_activations = x_sample %*% w
+    pos_hidden_activations = x_sample %*% weights
     pos_hidden_probs = activation_function(pos_hidden_activations)
     pos_hidden_states = pos_hidden_probs > Matrix(runif(nrow(x_sample)*(num_hidden+1)), nrow=nrow(x_sample), ncol=(num_hidden+1))
     
@@ -134,10 +129,10 @@ rbm <- function (x, num_hidden = 2, max_epochs = 1000, learning_rate = 0.1, use_
     
     # Reconstruct the visible units and sample again from the hidden units.
     # (This is the "negative CD phase", aka the daydreaming phase.)
-    neg_visible_activations = Matrix:::tcrossprod(pos_hidden_states, w)
+    neg_visible_activations = Matrix:::tcrossprod(pos_hidden_states, weights)
     neg_visible_probs = activation_function(neg_visible_activations)
     neg_visible_probs[,1] = 1 # Fix the bias unit.
-    neg_hidden_activations = neg_visible_probs %*% w
+    neg_hidden_activations = neg_visible_probs %*% weights
     neg_hidden_probs = activation_function(neg_hidden_activations)
     
     # Note, again, that we're using the activation *probabilities* when computing associations, not the states 
@@ -145,7 +140,7 @@ rbm <- function (x, num_hidden = 2, max_epochs = 1000, learning_rate = 0.1, use_
     neg_associations = Matrix:::crossprod(neg_visible_probs, neg_hidden_probs)
     
     # Update weights
-    weights = w + learning_rate * ((pos_associations - neg_associations) / nrow(x_sample))
+    weights = weights + learning_rate * ((pos_associations - neg_associations) / nrow(x_sample))
     if(verbose){
       error = sum((x - neg_visible_probs) ^ 2)
       print(sprintf("Epoch %s: error is %s", epoch, error))
