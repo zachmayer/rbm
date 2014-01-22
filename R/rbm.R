@@ -19,7 +19,7 @@
 #' @param activation_function function to convert hidden activations (-Inf, Inf) to hidden probabilities [0, 1].  Must be able to operate on sparse "Matrix" objects.
 #' @param ... not used
 #' @export
-#' @return a RBM object
+#' @return a rbm object
 #' @references
 #' \itemize{
 #' \item \url{http://blog.echen.me/2011/07/18/introduction-to-restricted-boltzmann-machines}
@@ -60,9 +60,8 @@
 #' #Predict for existing data
 #' predict(PCA)
 #' predict(RBM, type='probs')
-rbm <- function (x, num_hidden = 2, max_epochs = 1000, learning_rate = 0.1, use_mini_batches = FALSE, batch_size = 250, initial_weights_mean = 0, initial_weights_sd = 0.1, momentum = 0, dropout = FALSE, dropout_pct = .50, retx = FALSE, activation_function=NULL, verbose = FALSE, ...) {
-  require('Matrix')
-  #stop('not implemented')
+rbm <- function (x, num_hidden = 10, max_epochs = 1000, learning_rate = 0.1, use_mini_batches = FALSE, batch_size = 250, initial_weights_mean = 0, initial_weights_sd = 0.1, momentum = 0, dropout = FALSE, dropout_pct = .50, retx = FALSE, activation_function=NULL, verbose = FALSE, ...) {
+  require('Matrix')`
   
   #Checks
   stopifnot(length(dim(x)) == 2)
@@ -163,7 +162,7 @@ rbm <- function (x, num_hidden = 2, max_epochs = 1000, learning_rate = 0.1, use_
     output_x <- NULL
   }
   out <- list(rotation=weights, activation_function=activation_function, x=output_x)
-  class(out) <- 'RBM'
+  class(out) <- 'rbm'
   return(out)
 }
 
@@ -174,7 +173,7 @@ rbm <- function (x, num_hidden = 2, max_epochs = 1000, learning_rate = 0.1, use_
 #' @param x a RBM object
 #' @param ... not used
 #' @export
-print.RBM <- function (object, ...) {
+print.rbm <- function (object, ...) {
   print(object$rotation) 
 }
 
@@ -187,7 +186,7 @@ print.RBM <- function (object, ...) {
 #' @param ... not used
 #' @export
 #' @return a sparse matrix
-predict.RBM <- function (object, newdata, type='probs', ...) {
+predict.rbm <- function (object, newdata, type='probs', ...) {
   require('Matrix')
   if (missing(newdata)) {
     if (!is.null(object$x)) {
