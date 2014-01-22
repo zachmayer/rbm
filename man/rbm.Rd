@@ -3,17 +3,39 @@
 \title{Fit a Restricted Boltzmann Machine}
 \usage{
 rbm(x, num_hidden = 2, max_epochs = 1000, learning_rate = 0.1,
-  batch_size = nrow(x), initial_weights_mean = 0,
+  use_mini_batches = FALSE, batch_size = 250, initial_weights_mean = 0,
   initial_weights_sd = 0.1, momentum = 0, dropout = FALSE, retx = FALSE,
-  verbose = FALSE, ...)
+  activation_function = NULL, verbose = FALSE, ...)
 }
 \arguments{
   \item{x}{a sparse matrix}
 
   \item{num_hidden}{number of neurons in the hidden layer}
 
+  \item{max_epochs}{}
+
+  \item{learning_rate}{}
+
+  \item{use_mini_batches}{}
+
+  \item{batch_size}{}
+
+  \item{initial_weights_mean}{}
+
+  \item{initial_weights_sd}{}
+
+  \item{momentum}{}
+
+  \item{dropout}{}
+
   \item{retx}{whether to return the RBM predictions for the
   input data}
+
+  \item{verbose}{}
+
+  \item{activation_function}{function to convert hidden
+  activations (-Inf, Inf) to hidden probabilities [0, 1].
+  Must be able to operate on sparse "Matrix" objects.}
 
   \item{...}{not used}
 }
@@ -50,8 +72,8 @@ PCA <- prcomp(dat)
 RBM <- rbm(dat, retx=TRUE)
 
 #Examine the 2 models
-round(PCA$rotation, 2) #PCA weights
-round(RBM$rotation, 2) #RBM weights
+round(PCA$rotation, 2, retx=TRUE) #PCA weights
+round(RBM$rotation, 2, retx=TRUE) #RBM weights
 
 #Predict for new data
 George <- as.matrix(t(c('Harry_Potter' = 0, Avatar = 0, 'LOTR3' = 0, Gladiator = 1, Titanic = 1, Glitter = 0)))
@@ -59,5 +81,9 @@ predict(PCA, George)
 predict(RBM, George, type='activations')
 predict(RBM, George, type='probs')
 predict(RBM, George, type='states')
+
+#Predict for existing data
+predict(PCA)
+predict(RBM, type='probs')
 }
 

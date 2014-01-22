@@ -16,6 +16,7 @@
 #' @param dropout 
 #' @param retx whether to return the RBM predictions for the input data
 #' @param verbose 
+#' @param activation_function function to convert hidden activations (-Inf, Inf) to hidden probabilities [0, 1].  Must be able to operate on sparse "Matrix" objects.
 #' @param ... not used
 #' @export
 #' @return a RBM object
@@ -36,8 +37,8 @@
 #' RBM <- rbm(dat, retx=TRUE)
 #' 
 #' #Examine the 2 models
-#' round(PCA$rotation, 2) #PCA weights
-#' round(RBM$rotation, 2) #RBM weights
+#' round(PCA$rotation, 2, retx=TRUE) #PCA weights
+#' round(RBM$rotation, 2, retx=TRUE) #RBM weights
 #' 
 #' #Predict for new data
 #' George <- as.matrix(t(c('Harry_Potter' = 0, Avatar = 0, 'LOTR3' = 0, Gladiator = 1, Titanic = 1, Glitter = 0)))
@@ -45,7 +46,11 @@
 #' predict(RBM, George, type='activations')
 #' predict(RBM, George, type='probs')
 #' predict(RBM, George, type='states')
-rbm <- function (x, num_hidden = 2, max_epochs = 1000, learning_rate = 0.1, use_mini_batches = FALSE, batch_size = 250, initial_weights_mean = 0, initial_weights_sd = 0.1, momentum = 0, dropout = FALSE, retx = FALSE, verbose = FALSE, ...) {
+#' 
+#' #Predict for existing data
+#' predict(PCA)
+#' predict(RBM, type='probs')
+rbm <- function (x, num_hidden = 2, max_epochs = 1000, learning_rate = 0.1, use_mini_batches = FALSE, batch_size = 250, initial_weights_mean = 0, initial_weights_sd = 0.1, momentum = 0, dropout = FALSE, retx = FALSE, activation_function=NULL, verbose = FALSE, ...) {
   require('Matrix')
   #stop('not implemented')
   
@@ -73,11 +78,10 @@ rbm <- function (x, num_hidden = 2, max_epochs = 1000, learning_rate = 0.1, use_
   if(momentum>0){warning('Momentum > 0 not yet implemented.  Ignoring momentum')}
   if(dropout){warning('Dropout not yet implemented')}
   
-  #Setup
-  logistic <- function(x){
-    1.0 / (1 + exp(-x))
+  if(is.null(activation_function)){
+    activation_function <- function(x){1.0 / (1 + exp(-x))}
   }
-  
+
   # Initialize a weight matrix, of dimensions (num_visible x num_hidden), using
   # a Gaussian distribution with mean 0 and standard deviation 0.1.
   #momentum_speed <- sparseMatrix(1, 1, x=0, dims=c(p, num_hidden))
@@ -110,7 +114,7 @@ rbm <- function (x, num_hidden = 2, max_epochs = 1000, learning_rate = 0.1, use_
     # Clamp to the data and sample from the hidden units. 
     # (This is the "positive CD phase", aka the reality phase.)
     pos_hidden_activations = x_sample %*% w
-    pos_hidden_probs = logistic(pos_hidden_activations)
+    pos_hidden_probs = activation_function(pos_hidden_activations)
     pos_hidden_states = pos_hidden_probs > Matrix(runif(nrow(x_sample)*(num_hidden+1)), nrow=nrow(x_sample), ncol=(num_hidden+1))
     
     # Note that we're using the activation *probabilities* of the hidden states, not the hidden states       
@@ -121,10 +125,10 @@ rbm <- function (x, num_hidden = 2, max_epochs = 1000, learning_rate = 0.1, use_
     # Reconstruct the visible units and sample again from the hidden units.
     # (This is the "negative CD phase", aka the daydreaming phase.)
     neg_visible_activations = Matrix:::tcrossprod(pos_hidden_states, w)
-    neg_visible_probs = logistic(neg_visible_activations)
+    neg_visible_probs = activation_function(neg_visible_activations)
     neg_visible_probs[,1] = 1 # Fix the bias unit.
     neg_hidden_activations = neg_visible_probs %*% w
-    neg_hidden_probs = logistic(neg_hidden_activations)
+    neg_hidden_probs = activation_function(neg_hidden_activations)
     
     # Note, again, that we're using the activation *probabilities* when computing associations, not the states 
     # themselves.
@@ -144,7 +148,7 @@ rbm <- function (x, num_hidden = 2, max_epochs = 1000, learning_rate = 0.1, use_
   } else {
     output_x <- NULL
   }
-  out <- list(rotation=weights, activation_function=logistic, x=output_x)
+  out <- list(rotation=weights, activation_function=activation_function, x=output_x)
   class(out) <- 'RBM'
   return(out)
 }
@@ -162,10 +166,10 @@ print.RBM <- function (object, ...) {
 
 #' Predict from a Restricted Boltzmann Machine
 #' 
-#' This function takes an RBM and a matrix of new data, and predicts for the new data with the RBM. Note that RBMs are stochastic, so you will get slightly different predictions each time you run this function.
-#'  
+#' This function takes an RBM and a matrix of new data, and predicts for the new data with the RBM.
 #' @param x a RBM object
 #' @param newdata a sparse matrix of new data
+#' @param type a character vector specifying whether to return the hidden unit activations, hidden unit probs, or hidden unit states.  Activations or probabilities are typically the most useful if you wish to use the RBM features as input to another predictive model (or another RBM!).  Note that the hidden states are stochastic, and may be different each time you run the predict function, unless you set random.seed() before making predictions.  Activations and states are non-stochastic, and will be the same each time you run predict.
 #' @param ... not used
 #' @export
 #' @return a sparse matrix
