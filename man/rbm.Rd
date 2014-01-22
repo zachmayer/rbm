@@ -64,7 +64,7 @@ Alice <- c('Harry_Potter' = 1, Avatar = 1, 'LOTR3' = 1, Gladiator = 0, Titanic =
 Bob <- c('Harry_Potter' = 1, Avatar = 0, 'LOTR3' = 1, Gladiator = 0, Titanic = 0, Glitter = 0) #SF/fantasy fan, but doesn't like Avatar.
 Carol <- c('Harry_Potter' = 1, Avatar = 1, 'LOTR3' = 1, Gladiator = 0, Titanic = 0, Glitter = 0) #Big SF/fantasy fan.
 David <- c('Harry_Potter' = 0, Avatar = 0, 'LOTR3' = 1, Gladiator = 1, Titanic = 1, Glitter = 0) #Big Oscar winners fan.
-Eric <- c('Harry_Potter' = 0, Avatar = 0, 'LOTR3' = 1, Gladiator = 1, Titanic = 1, Glitter = 0) #Oscar winners fan, except for Titanic.
+Eric <- c('Harry_Potter' = 0, Avatar = 0, 'LOTR3' = 1, Gladiator = 1, Titanic = 0, Glitter = 0) #Oscar winners fan, except for Titanic.
 Fred <- c('Harry_Potter' = 0, Avatar = 0, 'LOTR3' = 1, Gladiator = 1, Titanic = 1, Glitter = 0) #Big Oscar winners fan.
 dat <- rbind(Alice, Bob, Carol, David, Eric, Fred)
 
@@ -88,12 +88,18 @@ predict(PCA)
 predict(RBM, type='probs')
 }
 \references{
-  http://blog.echen.me/2011/07/18/introduction-to-restricted-boltzmann-machines/
-  https://github.com/echen/restricted-boltzmann-machines
-  http://alandgraf.blogspot.com/2013/01/restricted-boltzmann-machines-in-r.html
-  http://web.info.uvt.ro/~dzaharie/cne2013/proiecte/tehnici/DeepLearning/DL_tutorialSlides.pdf
-  http://deeplearning.net/tutorial/rbm.html
-  http://www.cs.toronto.edu/~hinton/absps/guideTR.pdf
-  http://www.cs.toronto.edu/~nitish/msc_thesis.pdf
+  \itemize{ \item
+  \url{http://blog.echen.me/2011/07/18/introduction-to-restricted-boltzmann-machines}
+  \item
+  \url{https://github.com/echen/restricted-boltzmann-machines}
+  \item
+  \url{http://alandgraf.blogspot.com/2013/01/restricted-boltzmann-machines-in-r.html}
+  \item
+  \url{http://web.info.uvt.ro/~dzaharie/cne2013/proiecte/tehnici/DeepLearning/DL_tutorialSlides.pdf}
+  \item \url{http://deeplearning.net/tutorial/rbm.html}
+  \item
+  \url{http://www.cs.toronto.edu/~hinton/absps/guideTR.pdf}
+  \item
+  \url{http://www.cs.toronto.edu/~nitish/msc_thesis.pdf} }
 }
 

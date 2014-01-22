@@ -21,13 +21,15 @@
 #' @export
 #' @return a RBM object
 #' @references
-#' http://blog.echen.me/2011/07/18/introduction-to-restricted-boltzmann-machines/
-#' https://github.com/echen/restricted-boltzmann-machines
-#' http://alandgraf.blogspot.com/2013/01/restricted-boltzmann-machines-in-r.html
-#' http://web.info.uvt.ro/~dzaharie/cne2013/proiecte/tehnici/DeepLearning/DL_tutorialSlides.pdf
-#' http://deeplearning.net/tutorial/rbm.html
-#' http://www.cs.toronto.edu/~hinton/absps/guideTR.pdf
-#' http://www.cs.toronto.edu/~nitish/msc_thesis.pdf
+#' \itemize{
+#' \item \url{http://blog.echen.me/2011/07/18/introduction-to-restricted-boltzmann-machines}
+#' \item \url{https://github.com/echen/restricted-boltzmann-machines}
+#' \item \url{http://alandgraf.blogspot.com/2013/01/restricted-boltzmann-machines-in-r.html}
+#' \item \url{http://web.info.uvt.ro/~dzaharie/cne2013/proiecte/tehnici/DeepLearning/DL_tutorialSlides.pdf}
+#' \item \url{http://deeplearning.net/tutorial/rbm.html}
+#' \item \url{http://www.cs.toronto.edu/~hinton/absps/guideTR.pdf}
+#' \item \url{http://www.cs.toronto.edu/~nitish/msc_thesis.pdf}
+#' }
 #' @examples
 #' #Setup a dataset
 #' set.seed(10)
@@ -36,7 +38,7 @@
 #' Bob <- c('Harry_Potter' = 1, Avatar = 0, 'LOTR3' = 1, Gladiator = 0, Titanic = 0, Glitter = 0) #SF/fantasy fan, but doesn't like Avatar.
 #' Carol <- c('Harry_Potter' = 1, Avatar = 1, 'LOTR3' = 1, Gladiator = 0, Titanic = 0, Glitter = 0) #Big SF/fantasy fan.
 #' David <- c('Harry_Potter' = 0, Avatar = 0, 'LOTR3' = 1, Gladiator = 1, Titanic = 1, Glitter = 0) #Big Oscar winners fan.
-#' Eric <- c('Harry_Potter' = 0, Avatar = 0, 'LOTR3' = 1, Gladiator = 1, Titanic = 1, Glitter = 0) #Oscar winners fan, except for Titanic.
+#' Eric <- c('Harry_Potter' = 0, Avatar = 0, 'LOTR3' = 1, Gladiator = 1, Titanic = 0, Glitter = 0) #Oscar winners fan, except for Titanic.
 #' Fred <- c('Harry_Potter' = 0, Avatar = 0, 'LOTR3' = 1, Gladiator = 1, Titanic = 1, Glitter = 0) #Big Oscar winners fan.
 #' dat <- rbind(Alice, Bob, Carol, David, Eric, Fred)
 #' 
@@ -91,21 +93,22 @@ rbm <- function (x, num_hidden = 2, max_epochs = 1000, learning_rate = 0.1, use_
   if(is.null(activation_function)){
     activation_function <- function(x){1.0 / (1 + exp(-x))}
   }
-
+  
   # Initialize a weight matrix, of dimensions (num_visible x num_hidden), using
   # a Gaussian distribution with mean 0 and standard deviation 0.1.
   #momentum_speed <- sparseMatrix(1, 1, x=0, dims=c(p, num_hidden))
   weights = matrix(rnorm(num_hidden*ncol(x), mean=initial_weights_mean, sd=initial_weights_sd), nrow=ncol(x), ncol=num_hidden)
   # Insert weights for the bias units into the first row and first column.
-  weights = cbind(rep(0, nrow(weights)), weights)
-  weights = rbind(rep(0, ncol(weights)), weights)
+  weights = cbind(0, weights)
+  weights = rbind(0, weights)
   weights = Matrix(weights, sparse=TRUE)
   
   # Insert bias units of 1 into the first column.
-  x <- cBind(Bias_Unit=rep(1, nrow(x)), x)
+  x <- cBind(Bias_Unit=1, x)
   dimnames(weights) = list(colnames(x), c('Bias_Unit', paste('Hidden', 1:num_hidden, sep='_')))
   
   #Fit the model
+  x <- drop0(x)
   for (epoch in 1:max_epochs){
     
     #Sample mini-batch
@@ -119,6 +122,12 @@ rbm <- function (x, num_hidden = 2, max_epochs = 1000, learning_rate = 0.1, use_
     # Clamp to the data and sample from the hidden units. 
     # (This is the "positive CD phase", aka the reality phase.)
     pos_hidden_activations = x_sample %*% weights
+    if(dropout){
+      pos_hidden_activations_dropped = pos_hidden_activations
+      pos_hidden_activations_dropped@x[runif(length(pos_hidden_activations_dropped@x)) < dropout_pct] = 0
+      pos_hidden_activations_dropped[,1] <- pos_hidden_activations[,1]
+      pos_hidden_activations <- pos_hidden_activations_dropped
+    } 
     pos_hidden_probs = activation_function(pos_hidden_activations)
     pos_hidden_states = pos_hidden_probs > Matrix(runif(nrow(x_sample)*(num_hidden+1)), nrow=nrow(x_sample), ncol=(num_hidden+1))
     
