@@ -1,0 +1,13 @@
+Package: rbm
+Type: Package
+Title: Restricted Boltzmann Machines
+Version: 0.1
+Date: 2013-01-22
+Author: Zach Mayer
+Maintainer: Zach Mayer <zach.mayer@gmail.com>
+Description: This package implements Restricted Boltzmann Machines
+Depends:
+    R (>= 2.15.0),
+    Matrix,
+    testthat
+License: GPL-2
