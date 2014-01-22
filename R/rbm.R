@@ -82,8 +82,10 @@ rbm <- function (x, num_hidden = 2, max_epochs = 1000, learning_rate = 0.1, use_
   
   stopifnot(is.numeric(momentum))
   stopifnot(momentum >= 0 & momentum <=1)
-  
   if(momentum>0){warning('Momentum > 0 not yet implemented.  Ignoring momentum')}
+  
+  stopifnot(is.numeric(dropout_pct))
+  stopifnot(dropout_pct >= 0 & dropout_pct <1)
   if(dropout){warning('Dropout not yet implemented')}
   
   if(is.null(activation_function)){
