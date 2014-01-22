@@ -88,12 +88,18 @@ predict(PCA)
 predict(RBM, type='probs')
 }
 \references{
-  http://blog.echen.me/2011/07/18/introduction-to-restricted-boltzmann-machines/
-  https://github.com/echen/restricted-boltzmann-machines
-  http://alandgraf.blogspot.com/2013/01/restricted-boltzmann-machines-in-r.html
-  http://web.info.uvt.ro/~dzaharie/cne2013/proiecte/tehnici/DeepLearning/DL_tutorialSlides.pdf
-  http://deeplearning.net/tutorial/rbm.html
-  http://www.cs.toronto.edu/~hinton/absps/guideTR.pdf
-  http://www.cs.toronto.edu/~nitish/msc_thesis.pdf
+  \itemize{ \item
+  \url{http://blog.echen.me/2011/07/18/introduction-to-restricted-boltzmann-machines}
+  \item
+  \url{https://github.com/echen/restricted-boltzmann-machines}
+  \item
+  \url{http://alandgraf.blogspot.com/2013/01/restricted-boltzmann-machines-in-r.html}
+  \item
+  \url{http://web.info.uvt.ro/~dzaharie/cne2013/proiecte/tehnici/DeepLearning/DL_tutorialSlides.pdf}
+  \item \url{http://deeplearning.net/tutorial/rbm.html}
+  \item
+  \url{http://www.cs.toronto.edu/~hinton/absps/guideTR.pdf}
+  \item
+  \url{http://www.cs.toronto.edu/~nitish/msc_thesis.pdf} }
 }
 
