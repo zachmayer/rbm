@@ -68,12 +68,12 @@ Fred <- c('Harry_Potter' = 0, Avatar = 0, 'LOTR3' = 1, Gladiator = 1, Titanic = 
 dat <- rbind(Alice, Bob, Carol, David, Eric, Fred)
 
 #Fit a PCA model and an RBM model
-PCA <- prcomp(dat)
+PCA <- prcomp(dat, retx=TRUE)
 RBM <- rbm(dat, retx=TRUE)
 
 #Examine the 2 models
-round(PCA$rotation, 2, retx=TRUE) #PCA weights
-round(RBM$rotation, 2, retx=TRUE) #RBM weights
+round(PCA$rotation, 2) #PCA weights
+round(RBM$rotation, 2) #RBM weights
 
 #Predict for new data
 George <- as.matrix(t(c('Harry_Potter' = 0, Avatar = 0, 'LOTR3' = 0, Gladiator = 1, Titanic = 1, Glitter = 0)))
