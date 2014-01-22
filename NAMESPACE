@@ -1,3 +1,6 @@
-S3method(predict,RBM)
-export(print.RBM)
+S3method(plot,rbm)
+S3method(predict,rbm)
+S3method(predict,stacked_rbm)
+export(print.rbm)
 export(rbm)
+export(stacked_rbm)

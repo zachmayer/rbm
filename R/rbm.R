@@ -197,7 +197,6 @@ plot.rbm <- function (object, ...) {
   plot(object$error) 
 }
 
-
 #' Predict from a Restricted Boltzmann Machine
 #' 
 #' This function takes an RBM and a matrix of new data, and predicts for the new data with the RBM.

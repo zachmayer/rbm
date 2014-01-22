@@ -1,9 +1,9 @@
-\name{predict.rbm}
-\alias{predict.rbm}
-\title{Predict from a Restricted Boltzmann Machine}
+\name{predict.stacked_rbm}
+\alias{predict.stacked_rbm}
+\title{Predict from a Stacked Restricted Boltzmann Machine}
 \usage{
-\method{predict}{rbm}(object, newdata, type = "probs", omit_bias = TRUE,
-  ...)
+\method{predict}{stacked_rbm}(object, newdata, type = "probs",
+  omit_bias = TRUE, ...)
 }
 \arguments{
   \item{x}{a RBM object}
@@ -27,7 +27,7 @@
   a sparse matrix
 }
 \description{
-  This function takes an RBM and a matrix of new data, and
-  predicts for the new data with the RBM.
+  This function takes a stacked RBM and a matrix of new
+  data, and predicts for the new data with the RBM.
 }
 

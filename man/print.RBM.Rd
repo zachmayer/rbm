@@ -1,8 +1,8 @@
-\name{print.RBM}
-\alias{print.RBM}
+\name{print.rbm}
+\alias{print.rbm}
 \title{Print method for a Restricted Boltzmann Machine}
 \usage{
-print.RBM(object, ...)
+print.rbm(object, ...)
 }
 \arguments{
   \item{x}{a RBM object}
