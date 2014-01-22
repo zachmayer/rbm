@@ -6,7 +6,16 @@
 #'
 #' @param x a sparse matrix
 #' @param num_hidden number of neurons in the hidden layer
+#' @param max_epochs 
+#' @param learning_rate 
+#' @param use_mini_batches 
+#' @param batch_size
+#' @param initial_weights_mean 
+#' @param initial_weights_sd 
+#' @param momentum 
+#' @param dropout 
 #' @param retx whether to return the RBM predictions for the input data
+#' @param verbose 
 #' @param ... not used
 #' @export
 #' @return a RBM object
@@ -36,7 +45,7 @@
 #' predict(RBM, George, type='activations')
 #' predict(RBM, George, type='probs')
 #' predict(RBM, George, type='states')
-rbm <- function (x, num_hidden = 2, max_epochs = 1000, learning_rate = 0.1, batch_size = nrow(x), initial_weights_mean = 0, initial_weights_sd = 0.1, momentum = 0, dropout = FALSE, retx = FALSE, verbose=FALSE, ...) {
+rbm <- function (x, num_hidden = 2, max_epochs = 1000, learning_rate = 0.1, use_mini_batches = FALSE, batch_size = 250, initial_weights_mean = 0, initial_weights_sd = 0.1, momentum = 0, dropout = FALSE, retx = FALSE, verbose = FALSE, ...) {
   require('Matrix')
   #stop('not implemented')
   
@@ -85,10 +94,18 @@ rbm <- function (x, num_hidden = 2, max_epochs = 1000, learning_rate = 0.1, batc
   #Fit the model
   for (epoch in 1:max_epochs){
     
-    train_rows = sample(1:nrow(x), batch_size, replace=TRUE)
-    train_rows = 1:nrow(x)
-    x_sample = x[train_rows,]
+    #Sample mini-batch
+    if(use_mini_batches){
+      train_rows = sample(1:nrow(x), batch_size, replace=TRUE)
+      x_sample = x[train_rows,]
+    } else {
+      x_sample = x
+    }
+
+    #Dropout some weights
     w = weights
+    if(dropout){
+    }
     
     # Clamp to the data and sample from the hidden units. 
     # (This is the "positive CD phase", aka the reality phase.)
