@@ -172,45 +172,49 @@ print.RBM <- function (object, ...) {
 predict.RBM <- function (object, newdata, type='probs', ...) {
   require('Matrix')
   if (missing(newdata)) {
-    if (!is.null(object$x)) 
-      return(object$x)
-    else stop("no scores are available: refit with 'retx=TRUE'")
-  }
-  
-  #Checks
-  stopifnot(length(dim(newdata)) == 2)
-  stopifnot(type %in% c('activations', 'probs', 'states'))
-  if(any('data.frame' %in% class(newdata))){
-    if(any(!sapply(newdata, is.numeric))){
-      stop('x must be all finite, numeric data.  rbm does not handle characters, factors, dates, etc.')
+    if (!is.null(object$x)) {
+      hidden_activations <- object$x
+      rows <- nrow(object$x)
     }
-    x = Matrix(as.matrix(newdata), sparse=TRUE)
-  } else if (any('matrix' %in% class(newdata))){
-    x = Matrix(newdata, sparse=TRUE)
-  } else if(length(attr(class(newdata), 'package')) != 1){
-    stop('Unsupported class for rmb: ', paste(class(newdata), collapse=', '))
-  } else if(attr(class(newdata), 'package') != 'Matrix'){
-    stop('Unsupported class for rmb: ', paste(class(newdata), collapse=', '))
+    else stop("no scores are available: refit with 'retx=TRUE'")
+  } else {
+    #Checks
+    stopifnot(length(dim(newdata)) == 2)
+    stopifnot(type %in% c('activations', 'probs', 'states'))
+    if(any('data.frame' %in% class(newdata))){
+      if(any(!sapply(newdata, is.numeric))){
+        stop('x must be all finite, numeric data.  rbm does not handle characters, factors, dates, etc.')
+      }
+      x = Matrix(as.matrix(newdata), sparse=TRUE)
+    } else if (any('matrix' %in% class(newdata))){
+      x = Matrix(newdata, sparse=TRUE)
+    } else if(length(attr(class(newdata), 'package')) != 1){
+      stop('Unsupported class for rmb: ', paste(class(newdata), collapse=', '))
+    } else if(attr(class(newdata), 'package') != 'Matrix'){
+      stop('Unsupported class for rmb: ', paste(class(newdata), collapse=', '))
+    }
+    
+    # Insert bias units of 1 into the first column.
+    newdata <- cBind(Bias_Unit=rep(1, nrow(newdata)), newdata)
+    
+    nm <- rownames(object$rotation)
+    if (!is.null(nm)) {
+      if (!all(nm %in% colnames(newdata))) 
+        stop("'newdata' does not have named columns matching one or more of the original columns")
+      newdata <- newdata[, nm, drop = FALSE]
+    }
+    else {
+      if (NCOL(newdata) != NROW(object$rotation)) 
+        stop("'newdata' does not have the correct number of columns")
+    }
+    hidden_activations <- newdata %*% object$rotation
+    rows <- nrow(newdata)
   }
-  
-  # Insert bias units of 1 into the first column.
-  newdata <- cBind(Bias_Unit=rep(1, nrow(newdata)), newdata)
 
-  nm <- rownames(object$rotation)
-  if (!is.null(nm)) {
-    if (!all(nm %in% colnames(newdata))) 
-      stop("'newdata' does not have named columns matching one or more of the original columns")
-    newdata <- newdata[, nm, drop = FALSE]
-  }
-  else {
-    if (NCOL(newdata) != NROW(object$rotation)) 
-      stop("'newdata' does not have the correct number of columns")
-  }
-  hidden_activations <- newdata %*% object$rotation
   if(type=='activations'){return(hidden_activations)}
   hidden_probs <- object$activation_function(hidden_activations)
   if(type=='probs'){return(hidden_probs)}
-  hidden_states <- hidden_probs > Matrix(runif(nrow(newdata)*ncol(object$rotation)), nrow=nrow(newdata), ncol=ncol(object$rotation))
+  hidden_states <- hidden_probs > Matrix(runif(rows*ncol(object$rotation)), nrow=rows, ncol=ncol(object$rotation))
   return(hidden_states)
   
 }
