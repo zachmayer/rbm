@@ -1,3 +1,7 @@
+#TODO: MOMENTUM
+#TODO: SAVE TRAINING ERROR
+#TODO: PLOT METHOD TO PLOT TRAINING ERROR
+
 #' Fit a Restricted Boltzmann Machine
 #' 
 #' This function fits an RBM to the input dataset.  It internally uses sparse matricies for faster matrix operations
@@ -61,7 +65,7 @@
 #' predict(PCA)
 #' predict(RBM, type='probs')
 rbm <- function (x, num_hidden = 10, max_epochs = 1000, learning_rate = 0.1, use_mini_batches = FALSE, batch_size = 250, initial_weights_mean = 0, initial_weights_sd = 0.1, momentum = 0, dropout = FALSE, dropout_pct = .50, retx = FALSE, activation_function=NULL, verbose = FALSE, ...) {
-  require('Matrix')`
+  require('Matrix')
   
   #Checks
   stopifnot(length(dim(x)) == 2)
@@ -117,7 +121,7 @@ rbm <- function (x, num_hidden = 10, max_epochs = 1000, learning_rate = 0.1, use
     } else {
       x_sample = x
     }
-
+    
     # Clamp to the data and sample from the hidden units. 
     # (This is the "positive CD phase", aka the reality phase.)
     pos_hidden_activations = x_sample %*% weights
@@ -186,7 +190,7 @@ print.rbm <- function (object, ...) {
 #' @param ... not used
 #' @export
 #' @return a sparse matrix
-predict.rbm <- function (object, newdata, type='probs', ...) {
+predict.rbm <- function (object, newdata, type='probs', omit_bias=TRUE, ...) {
   require('Matrix')
   if (missing(newdata)) {
     if (!is.null(object$x)) {
@@ -227,11 +231,19 @@ predict.rbm <- function (object, newdata, type='probs', ...) {
     hidden_activations <- newdata %*% object$rotation
     rows <- nrow(newdata)
   }
-
-  if(type=='activations'){return(hidden_activations)}
-  hidden_probs <- object$activation_function(hidden_activations)
-  if(type=='probs'){return(hidden_probs)}
-  hidden_states <- hidden_probs > Matrix(runif(rows*ncol(object$rotation)), nrow=rows, ncol=ncol(object$rotation))
-  return(hidden_states)
+  
+  if(omit_bias){
+    if(type=='activations'){return(hidden_activations[,-1])}
+    hidden_probs <- object$activation_function(hidden_activations)
+    if(type=='probs'){return(hidden_probs[,-1])}
+    hidden_states <- hidden_probs > Matrix(runif(rows*ncol(object$rotation)), nrow=rows, ncol=ncol(object$rotation))
+    return(hidden_states[,-1])
+  } else{
+    if(type=='activations'){return(hidden_activations)}
+    hidden_probs <- object$activation_function(hidden_activations)
+    if(type=='probs'){return(hidden_probs)}
+    hidden_states <- hidden_probs > Matrix(runif(rows*ncol(object$rotation)), nrow=rows, ncol=ncol(object$rotation))
+    return(hidden_states)
+  }
   
 }
