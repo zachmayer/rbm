@@ -20,6 +20,14 @@
 #' @param ... not used
 #' @export
 #' @return a RBM object
+#' @references
+#' http://blog.echen.me/2011/07/18/introduction-to-restricted-boltzmann-machines/
+#' https://github.com/echen/restricted-boltzmann-machines
+#' http://alandgraf.blogspot.com/2013/01/restricted-boltzmann-machines-in-r.html
+#' http://web.info.uvt.ro/~dzaharie/cne2013/proiecte/tehnici/DeepLearning/DL_tutorialSlides.pdf
+#' http://deeplearning.net/tutorial/rbm.html
+#' http://www.cs.toronto.edu/~hinton/absps/guideTR.pdf
+#' http://www.cs.toronto.edu/~nitish/msc_thesis.pdf
 #' @examples
 #' #Setup a dataset
 #' set.seed(10)
@@ -50,7 +58,7 @@
 #' #Predict for existing data
 #' predict(PCA)
 #' predict(RBM, type='probs')
-rbm <- function (x, num_hidden = 2, max_epochs = 1000, learning_rate = 0.1, use_mini_batches = FALSE, batch_size = 250, initial_weights_mean = 0, initial_weights_sd = 0.1, momentum = 0, dropout = FALSE, retx = FALSE, activation_function=NULL, verbose = FALSE, ...) {
+rbm <- function (x, num_hidden = 2, max_epochs = 1000, learning_rate = 0.1, use_mini_batches = FALSE, batch_size = 250, initial_weights_mean = 0, initial_weights_sd = 0.1, momentum = 0, dropout = FALSE, dropout_pct = .50, retx = FALSE, activation_function=NULL, verbose = FALSE, ...) {
   require('Matrix')
   #stop('not implemented')
   
