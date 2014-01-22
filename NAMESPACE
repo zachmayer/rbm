@@ -1,0 +1,2 @@
+S3method(predict,RBM)
+export(rbm)

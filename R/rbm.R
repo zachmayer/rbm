@@ -8,13 +8,13 @@
 #' @param ... not used
 #' @export
 #' @return a RBM object
-prcomp.irlba <- function (x, n = 5, retx = FALSE, ...) {
+rbm <- function (x, n = 5, retx = FALSE, ...) {
   require('Matrix')
   stop('not implemented')
   stopifnot(is.Matrix(x))
 }
 
-#' Fit a Restricted Boltzmann Machine
+#' Predict from a Restricted Boltzmann Machine
 #' 
 #' This function takes an RBM and a matrix of new data, and predicts for the new data with the RBM. Note that RBMs are stochastic, so you will get slightly different predictions each time you run this function
 #' 
