@@ -1,6 +1,7 @@
 #TODO: MOMENTUM
-#TODO: SAVE TRAINING ERROR
-#TODO: PLOT METHOD TO PLOT TRAINING ERROR
+#TODO: CHECKS A SEPARATE FUNCTION!
+#TODO: SAVE ALL PARAMETERS AND WRITE UPDATE METHOD
+#TODO: Checks that input data is in [0,1]
 
 #' Fit a Restricted Boltzmann Machine
 #' 
@@ -112,6 +113,7 @@ rbm <- function (x, num_hidden = 10, max_epochs = 1000, learning_rate = 0.1, use
   
   #Fit the model
   x <- drop0(x)
+  error_stream <- runif(max_epochs)
   for (epoch in 1:max_epochs){
     
     #Sample mini-batch
@@ -153,8 +155,11 @@ rbm <- function (x, num_hidden = 10, max_epochs = 1000, learning_rate = 0.1, use
     
     # Update weights
     weights = weights + learning_rate * ((pos_associations - neg_associations) / nrow(x_sample))
+    
+    #Print output
+    error = sum((x - neg_visible_probs) ^ 2)
+    error_stream[[epoch]] <- error
     if(verbose){
-      error = sum((x - neg_visible_probs) ^ 2)
       print(sprintf("Epoch %s: error is %s", epoch, error))
     }
   }   
@@ -165,7 +170,7 @@ rbm <- function (x, num_hidden = 10, max_epochs = 1000, learning_rate = 0.1, use
   } else {
     output_x <- NULL
   }
-  out <- list(rotation=weights, activation_function=activation_function, x=output_x)
+  out <- list(rotation=weights, activation_function=activation_function, x=output_x, error=error_stream, max_epochs=max_epochs)
   class(out) <- 'rbm'
   return(out)
 }
@@ -180,6 +185,18 @@ rbm <- function (x, num_hidden = 10, max_epochs = 1000, learning_rate = 0.1, use
 print.rbm <- function (object, ...) {
   print(object$rotation) 
 }
+
+#' Plot method for a Restricted Boltzmann Machine
+#' 
+#' This function plots the training error from an RBM
+#'  
+#' @param x a RBM object
+#' @param ... not used
+#' @export
+plot.rbm <- function (object, ...) {
+  plot(object$error) 
+}
+
 
 #' Predict from a Restricted Boltzmann Machine
 #' 
