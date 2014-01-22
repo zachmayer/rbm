@@ -119,6 +119,12 @@ rbm <- function (x, num_hidden = 2, max_epochs = 1000, learning_rate = 0.1, use_
     # Clamp to the data and sample from the hidden units. 
     # (This is the "positive CD phase", aka the reality phase.)
     pos_hidden_activations = x_sample %*% weights
+    if(dropout){
+      pos_hidden_activations_dropped = pos_hidden_activations
+      pos_hidden_activations_dropped@x[runif(length(pos_hidden_activations_dropped@x)) < dropout_pct] = 0
+      pos_hidden_activations_dropped[,1] <- pos_hidden_activations[,1]
+      pos_hidden_activations <- pos_hidden_activations_dropped
+    } 
     pos_hidden_probs = activation_function(pos_hidden_activations)
     pos_hidden_states = pos_hidden_probs > Matrix(runif(nrow(x_sample)*(num_hidden+1)), nrow=nrow(x_sample), ncol=(num_hidden+1))
     
