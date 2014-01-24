@@ -102,3 +102,17 @@ predict.stacked_rbm <- function (object, newdata, type='probs', omit_bias=TRUE, 
   }
   
 }
+
+#' Combine weights from a Stacked Restricted Boltzmann Machine
+#' 
+#' This function takes a stacked RBM and returns the combined weight matrix
+#' 
+#' @param x a RBM object
+#' @param layer which RBM to return weights for (usually the final RBM, which will combine all 3 RBMs into a single weight matrix)
+#' @param ... not used
+#' @export
+#' @return a sparse matrix
+combine_weights.stacked_rbm <- function(x, layer=length(x$rbm_list), ){
+  stop('NOT IMPLEMENTED!')
+  stack$rbm_list[[1]]$rotation %*% stack$rbm_list[[2]]$rotation %*% stack$rbm_list[[3]]$rotation
+}
