@@ -79,19 +79,18 @@ predict.stacked_rbm <- function (object, newdata, type='probs', omit_bias=TRUE, 
 
   #If no new data, just return predictions from the final rbm in the stack
   if (missing(newdata)) {
-    if (!is.null(object$x)) {
-      predict(object$rbm_list[[length(object$rbm_list)]], type=type, omit_bias=omit_bias)
-    }
+    return(predict(object$rbm_list[[length(object$rbm_list)]], type=type, omit_bias=omit_bias))
   } else {
     if(type %in% c('probs', 'states')){
       stop('Currently we can only return hidden probabilities or states from a stacked rbm.  Activations are not yet supported')
     }
     hidden_probs <- predict(object$rbm_list[[1]], newdata=newdata, type='probs', omit_bias=TRUE)
+    print(head(hidden_probs))
     for(i in 2:length(object$rbm_list)){
       hidden_probs <- predict(object$rbm_list[[i]], newdata=hidden_probs, type='probs', omit_bias=TRUE)
     }
   }
-  
+
   if(omit_bias){
     if(type=='probs'){return(hidden_probs[,-1])}
     hidden_states <- hidden_probs > Matrix(runif(nrow(hidden_probs)*ncol(hidden_probs)), nrow=nrow(hidden_probs), ncol=ncol(hidden_probs))
