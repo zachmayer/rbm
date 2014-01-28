@@ -93,12 +93,12 @@ predict(RBM, type='probs')
   \item
   \url{https://github.com/echen/restricted-boltzmann-machines}
   \item
+  \url{http://www.cs.toronto.edu/~hinton/absps/guideTR.pdf}
+  \item
   \url{http://alandgraf.blogspot.com/2013/01/restricted-boltzmann-machines-in-r.html}
   \item
   \url{http://web.info.uvt.ro/~dzaharie/cne2013/proiecte/tehnici/DeepLearning/DL_tutorialSlides.pdf}
   \item \url{http://deeplearning.net/tutorial/rbm.html}
-  \item
-  \url{http://www.cs.toronto.edu/~hinton/absps/guideTR.pdf}
   \item
   \url{http://www.cs.toronto.edu/~nitish/msc_thesis.pdf} }
 }
