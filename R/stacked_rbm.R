@@ -112,7 +112,7 @@ predict.stacked_rbm <- function (object, newdata, type='probs', omit_bias=TRUE, 
 #' @param ... not used
 #' @export
 #' @return a sparse matrix
-combine_weights.stacked_rbm <- function(x, layer=length(x$rbm_list), ){
+combine_weights.stacked_rbm <- function(x, layer=length(x$rbm_list)){
   stop('NOT IMPLEMENTED!')
   stack$rbm_list[[1]]$rotation %*% stack$rbm_list[[2]]$rotation %*% stack$rbm_list[[3]]$rotation
 }
