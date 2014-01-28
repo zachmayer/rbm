@@ -22,8 +22,13 @@
 #' dat <- rbind(Alice, Bob, Carol, David, Eric, Fred)
 #' 
 #' Stacked_RBM <- stacked_rbm(dat)
-stacked_rbm <- function (x, num_hidden = c(30, 100, 30), verbose_stack=TRUE, ...) {
-  require('Matrix')
+stacked_rbm <- function (x, num_hidden = c(30, 100, 30), verbose_stack=TRUE, use_gpu=FALSE, ...) {
+  stopifnot(require('Matrix'))
+  
+  if(use_gpu){
+    stopifnot(require('gputools'))
+    rbm <- rbm_gpu
+  }
   
   #Checks
   stopifnot(length(dim(x)) == 2)
