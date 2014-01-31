@@ -1,7 +1,7 @@
 #' Fit a Stack of Restricted Boltzmann Machines
 #' 
 #' @param x a sparse matrix
-#' @param num_hidden an integer vector of the number of neurons in each RBM
+#' @param layers an integer vector of the number of neurons in each RBM
 #' @param ... passed to the rbm function
 #' @export
 #' @return a stacked_rbm object
@@ -22,7 +22,7 @@
 #' dat <- rbind(Alice, Bob, Carol, David, Eric, Fred)
 #' 
 #' Stacked_RBM <- stacked_rbm(dat)
-stacked_rbm <- function (x, num_hidden = c(30, 100, 30), verbose_stack=TRUE, use_gpu=FALSE, ...) {
+stacked_rbm <- function (x, layers = c(30, 100, 30), verbose_stack=TRUE, use_gpu=FALSE, ...) {
   stopifnot(require('Matrix'))
   
   if(use_gpu){
@@ -48,23 +48,23 @@ stacked_rbm <- function (x, num_hidden = c(30, 100, 30), verbose_stack=TRUE, use
     stop('Unsupported class for rmb: ', paste(class(x), collapse=', '))
   }
   
-  if(length(num_hidden) < 2){
+  if(length(layers) < 2){
     stop('Please use the rbm function to fit a single rbm')
   }
   
   #Fit first RBM
   if(verbose_stack){print('Fitting RBM 1')}
-  rbm_list <- as.list(num_hidden)
-  rbm_list[[1]] <- rbm(x, num_hidden=num_hidden[[1]], retx=TRUE, ...)
+  rbm_list <- as.list(layers)
+  rbm_list[[1]] <- rbm(x, num_hidden=layers[[1]], retx=TRUE, ...)
 
   #Fit the rest of the RBMs
   for(i in 2:length(rbm_list)){
     if(verbose_stack){print(paste('Fitting RBM', i))}
-    rbm_list[[i]] <- rbm(predict(rbm_list[[i-1]], type='probs', omit_bias=TRUE), num_hidden=num_hidden[[i]], retx=TRUE, ...)
+    rbm_list[[i]] <- rbm(predict(rbm_list[[i-1]], type='probs', omit_bias=TRUE), num_hidden=layers[[i]], retx=TRUE, ...)
   }
   
   #Return result
-  out <- list(rbm_list=rbm_list, num_hidden=num_hidden, activation_function=rbm_list[[1]]$activation_function)
+  out <- list(rbm_list=rbm_list, layers=layers, activation_function=rbm_list[[1]]$activation_function)
   class(out) <- 'stacked_rbm'
   return(out)
 }
@@ -86,20 +86,19 @@ predict.stacked_rbm <- function (object, newdata, type='probs', omit_bias=TRUE, 
   if (missing(newdata)) {
     return(predict(object$rbm_list[[length(object$rbm_list)]], type=type, omit_bias=omit_bias))
   } else {
-    if(type %in% c('probs', 'states')){
+    if(! type %in% c('probs', 'states')){
       stop('Currently we can only return hidden probabilities or states from a stacked rbm.  Activations are not yet supported')
     }
     hidden_probs <- predict(object$rbm_list[[1]], newdata=newdata, type='probs', omit_bias=TRUE)
-    print(head(hidden_probs))
     for(i in 2:length(object$rbm_list)){
       hidden_probs <- predict(object$rbm_list[[i]], newdata=hidden_probs, type='probs', omit_bias=TRUE)
     }
   }
 
   if(omit_bias){
-    if(type=='probs'){return(hidden_probs[,-1])}
+    if(type=='probs'){return(hidden_probs)}
     hidden_states <- hidden_probs > Matrix(runif(nrow(hidden_probs)*ncol(hidden_probs)), nrow=nrow(hidden_probs), ncol=ncol(hidden_probs))
-    return(hidden_states[,-1])
+    return(hidden_states)
   } else{
     if(type=='probs'){return(hidden_probs)}
     hidden_states <- hidden_probs > Matrix(runif(rows*ncol(object$rotation)), nrow=rows, ncol=ncol(object$rotation))
@@ -118,6 +117,5 @@ predict.stacked_rbm <- function (object, newdata, type='probs', omit_bias=TRUE, 
 #' @export
 #' @return a sparse matrix
 combine_weights.stacked_rbm <- function(x, layer=length(x$rbm_list)){
-  stop('NOT IMPLEMENTED!')
-  stack$rbm_list[[1]]$rotation %*% stack$rbm_list[[2]]$rotation %*% stack$rbm_list[[3]]$rotation
+  x$rbm_list[[1]]$rotation %*% x$rbm_list[[2]]$rotation %*% x$rbm_list[[3]]$rotation
 }
