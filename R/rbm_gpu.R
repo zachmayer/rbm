@@ -75,7 +75,7 @@ rbm_gpu <- function (x, num_hidden = 10, max_epochs = 1000, learning_rate = 0.1,
     }
     x = as.matrix(x)
   } else if (any('matrix' %in% class(x))){
-
+    sink <- 1
   } else if(length(attr(class(x), 'package')) != 1){
     stop('Unsupported class for rmb: ', paste(class(x), collapse=', '))
   } else if(attr(class(x), 'package') != 'Matrix'){
@@ -103,7 +103,7 @@ rbm_gpu <- function (x, num_hidden = 10, max_epochs = 1000, learning_rate = 0.1,
   weights = rbind(0, weights)
 
   # Insert bias units of 1 into the first column.
-  x <- cbind(Bias_Unit=1, x)
+  x <- cBind(Bias_Unit=1, x)
   dimnames(weights) = list(colnames(x), c('Bias_Unit', paste('Hidden', 1:num_hidden, sep='_')))
   
   #Fit the model
@@ -151,16 +151,16 @@ rbm_gpu <- function (x, num_hidden = 10, max_epochs = 1000, learning_rate = 0.1,
     weights = weights + learning_rate * ((pos_associations - neg_associations) / nrow(x_sample))
     
     #Print output
-    error = sum((x - neg_visible_probs) ^ 2)
+    error = sum((x_sample - neg_visible_probs) ^ 2)
     error_stream[[epoch]] <- error
     if(verbose){
       print(sprintf("Epoch %s: error is %s", epoch, error))
     }
-  }   
+  }
   
   #Return output
-  if(retx){
-    output_x <- gpuMatMult(x, weights)
+  if(retx){ 
+    output_x <- tryCatch(gpuMatMult(x, weights), error=function(e) x %*% weights) #Maybe make this sparse if the gpu fails?
   } else {
     output_x <- NULL
   }
@@ -215,7 +215,7 @@ predict.rbm_gpu <- function (object, newdata, type='probs', omit_bias=TRUE, ...)
       if (NCOL(newdata) != NROW(object$rotation)) 
         stop("'newdata' does not have the correct number of columns")
     }
-    hidden_activations <- gpuMatMult(newdata, object$rotation)
+    hidden_activations <- tryCatch(gpuMatMult(newdata, object$rotation), error=function(e) newdata %*% object$rotation)
     rows <- nrow(newdata)
   }
   

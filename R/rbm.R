@@ -161,7 +161,7 @@ rbm <- function (x, num_hidden = 10, max_epochs = 1000, learning_rate = 0.1, use
     weights = weights + learning_rate * ((pos_associations - neg_associations) / nrow(x_sample))
     
     #Print output
-    error = sum((x - neg_visible_probs) ^ 2)
+    error = sum((x_sample - neg_visible_probs) ^ 2)
     error_stream[[epoch]] <- error
     if(verbose){
       print(sprintf("Epoch %s: error is %s", epoch, error))
@@ -198,7 +198,7 @@ print.rbm <- function (object, ...) {
 #' @param ... not used
 #' @export
 plot.rbm <- function (object, ...) {
-  plot(object$error) 
+  plot(object$error, ...) 
 }
 
 #' Predict from a Restricted Boltzmann Machine
