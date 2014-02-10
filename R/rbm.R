@@ -1,3 +1,4 @@
+#TODO: IF NULL COLNAMES, SET THEN TO V1:VN.  TAKE OUT OPTION FOR NON-NULL COLNAMES!
 #TODO: MOMENTUM
 #TODO: CHECKS A SEPARATE FUNCTION!
 #TODO: SAVE ALL PARAMETERS AND WRITE UPDATE METHOD
@@ -70,7 +71,7 @@
 #' predict(PCA)
 #' predict(RBM, type='probs')
 rbm <- function (x, num_hidden = 10, max_epochs = 1000, learning_rate = 0.1, use_mini_batches = FALSE, batch_size = 250, initial_weights_mean = 0, initial_weights_sd = 0.1, momentum = 0, dropout = FALSE, dropout_pct = .50, retx = FALSE, activation_function=NULL, verbose = FALSE, ...) {
-  require('Matrix')
+  stopifnot(require('Matrix'))
   
   #Checks
   stopifnot(length(dim(x)) == 2)
@@ -211,7 +212,7 @@ plot.rbm <- function (object, ...) {
 #' @export
 #' @return a sparse matrix
 predict.rbm <- function (object, newdata, type='probs', omit_bias=TRUE, ...) {
-  require('Matrix')
+  stopifnot(require('Matrix'))
   if (missing(newdata)) {
     if (!is.null(object$x)) {
       hidden_activations <- object$x

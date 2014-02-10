@@ -26,8 +26,11 @@ stacked_rbm <- function (x, layers = c(30, 100, 30), verbose_stack=TRUE, use_gpu
   stopifnot(require('Matrix'))
   
   if(use_gpu){
-    stopifnot(require('gputools'))
-    rbm <- rbm_gpu
+    if(require('gputools')){
+      rbm <- rbm_gpu
+    } else {
+     warning('The gputools package is require to train RBMs on the gpu.  RBMs will be trained on the cpu instead.') 
+    }
   }
   
   #Checks
@@ -80,7 +83,7 @@ stacked_rbm <- function (x, layers = c(30, 100, 30), verbose_stack=TRUE, use_gpu
 #' @export
 #' @return a sparse matrix
 predict.stacked_rbm <- function (object, newdata, type='probs', omit_bias=TRUE, ...) {
-  require('Matrix')
+  stopifnot(require('Matrix'))
 
   #If no new data, just return predictions from the final rbm in the stack
   if (missing(newdata)) {

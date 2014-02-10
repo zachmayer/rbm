@@ -10,4 +10,6 @@ Depends:
     R (>= 2.15.0),
     Matrix,
     testthat
-License: GPL-2
+Suggests:
+	gputools
+License: MIT
