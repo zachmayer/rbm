@@ -2,21 +2,22 @@
 \alias{stacked_rbm}
 \title{Fit a Stack of Restricted Boltzmann Machines}
 \usage{
-stacked_rbm(x, num_hidden = c(30, 100, 30), verbose_stack = TRUE, ...)
+stacked_rbm(x, layers = c(30, 100, 30), learning_rate = 0.1,
+  verbose_stack = TRUE, use_gpu = FALSE, ...)
 }
 \arguments{
   \item{x}{a sparse matrix}
 
-  \item{num_hidden}{an integer vector of the number of
-  neurons in each RBM}
+  \item{layers}{an integer vector of the number of neurons
+  in each RBM}
 
   \item{...}{passed to the rbm function}
 }
 \value{
-  a stacked_rbm object
+a stacked_rbm object
 }
 \description{
-  Fit a Stack of Restricted Boltzmann Machines
+Fit a Stack of Restricted Boltzmann Machines
 }
 \examples{
 #Setup a dataset
@@ -33,8 +34,8 @@ dat <- rbind(Alice, Bob, Carol, David, Eric, Fred)
 Stacked_RBM <- stacked_rbm(dat)
 }
 \references{
-  \itemize{ \item
-  \url{http://blog.echen.me/2011/07/18/introduction-to-restricted-boltzmann-machines}
-  }
+\itemize{ \item
+\url{http://blog.echen.me/2011/07/18/introduction-to-restricted-boltzmann-machines}
+}
 }
 

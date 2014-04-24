@@ -41,20 +41,20 @@ rbm(x, num_hidden = 10, max_epochs = 1000, learning_rate = 0.1,
   \item{...}{not used}
 }
 \value{
-  a rbm object
+a rbm object
 }
 \description{
-  This function fits an RBM to the input dataset.  It
-  internally uses sparse matricies for faster matrix
-  operations
+This function fits an RBM to the input dataset.  It
+internally uses sparse matricies for faster matrix
+operations
 }
 \details{
-  This code is (mostly) adapted from edwin chen's python
-  code for RBMs, avaiable here:
-  https://github.com/echen/restricted-boltzmann-machines.
-  Some modifications (e.g. momentum) were adapted from
-  Andrew Landgraf's R code for RBMs, available here:
-  http://alandgraf.blogspot.com/2013/01/restricted-boltzmann-machines-in-r.html.
+This code is (mostly) adapted from edwin chen's python code
+for RBMs, avaiable here:
+https://github.com/echen/restricted-boltzmann-machines.
+Some modifications (e.g. momentum) were adapted from Andrew
+Landgraf's R code for RBMs, available here:
+http://alandgraf.blogspot.com/2013/01/restricted-boltzmann-machines-in-r.html.
 }
 \examples{
 #Setup a dataset
@@ -88,18 +88,17 @@ predict(PCA)
 predict(RBM, type='probs')
 }
 \references{
-  \itemize{ \item
-  \url{http://blog.echen.me/2011/07/18/introduction-to-restricted-boltzmann-machines}
-  \item
-  \url{https://github.com/echen/restricted-boltzmann-machines}
-  \item
-  \url{http://www.cs.toronto.edu/~hinton/absps/guideTR.pdf}
-  \item
-  \url{http://alandgraf.blogspot.com/2013/01/restricted-boltzmann-machines-in-r.html}
-  \item
-  \url{http://web.info.uvt.ro/~dzaharie/cne2013/proiecte/tehnici/DeepLearning/DL_tutorialSlides.pdf}
-  \item \url{http://deeplearning.net/tutorial/rbm.html}
-  \item
-  \url{http://www.cs.toronto.edu/~nitish/msc_thesis.pdf} }
+\itemize{ \item
+\url{http://blog.echen.me/2011/07/18/introduction-to-restricted-boltzmann-machines}
+\item
+\url{https://github.com/echen/restricted-boltzmann-machines}
+\item
+\url{http://www.cs.toronto.edu/~hinton/absps/guideTR.pdf}
+\item
+\url{http://alandgraf.blogspot.com/2013/01/restricted-boltzmann-machines-in-r.html}
+\item
+\url{http://web.info.uvt.ro/~dzaharie/cne2013/proiecte/tehnici/DeepLearning/DL_tutorialSlides.pdf}
+\item \url{http://deeplearning.net/tutorial/rbm.html} \item
+\url{http://www.cs.toronto.edu/~nitish/msc_thesis.pdf} }
 }
 

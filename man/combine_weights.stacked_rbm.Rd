@@ -14,10 +14,10 @@ combine_weights.stacked_rbm(x, layer = length(x$rbm_list))
   \item{...}{not used}
 }
 \value{
-  a sparse matrix
+a sparse matrix
 }
 \description{
-  This function takes a stacked RBM and returns the
-  combined weight matrix
+This function takes a stacked RBM and returns the combined
+weight matrix
 }
 

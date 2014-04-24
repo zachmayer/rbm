@@ -10,6 +10,6 @@ print.rbm(object, ...)
   \item{...}{not used}
 }
 \description{
-  This function prints the weights for a RBM
+This function prints the weights for a RBM
 }
 

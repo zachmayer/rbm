@@ -24,10 +24,10 @@
   \item{...}{not used}
 }
 \value{
-  a sparse matrix
+a sparse matrix
 }
 \description{
-  This function takes an RBM and a matrix of new data, and
-  predicts for the new data with the RBM.
+This function takes an RBM and a matrix of new data, and
+predicts for the new data with the RBM.
 }
 
