@@ -11,5 +11,5 @@ Depends:
     Matrix,
     testthat
 Suggests:
-	gputools
+    gputools
 License: MIT

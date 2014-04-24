@@ -10,6 +10,6 @@
   \item{...}{not used}
 }
 \description{
-  This function plots the training error from an RBM
+This function plots the training error from an RBM
 }
 
