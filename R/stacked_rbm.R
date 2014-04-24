@@ -22,7 +22,7 @@
 #' dat <- rbind(Alice, Bob, Carol, David, Eric, Fred)
 #' 
 #' Stacked_RBM <- stacked_rbm(dat)
-stacked_rbm <- function (x, layers = c(30, 100, 30), verbose_stack=TRUE, use_gpu=FALSE, ...) {
+stacked_rbm <- function (x, layers = c(30, 100, 30), learning_rate=0.1, verbose_stack=TRUE, use_gpu=FALSE, ...) {
   stopifnot(require('Matrix'))
   
   if(use_gpu){
@@ -35,6 +35,11 @@ stacked_rbm <- function (x, layers = c(30, 100, 30), verbose_stack=TRUE, use_gpu
   
   #Checks
   stopifnot(length(dim(x)) == 2)
+  if(length(learning_rate)==1){
+    learning_rate <- rep(learning_rate, length(layers))
+  }
+  stopifnot(length(layers) == length(learning_rate))
+  
   if(any('data.frame' %in% class(x))){
     if(any(!sapply(x, is.finite))){
       stop('x must be all finite.  rbm does not handle NAs, NaNs, Infs or -Infs')
@@ -58,12 +63,12 @@ stacked_rbm <- function (x, layers = c(30, 100, 30), verbose_stack=TRUE, use_gpu
   #Fit first RBM
   if(verbose_stack){print('Fitting RBM 1')}
   rbm_list <- as.list(layers)
-  rbm_list[[1]] <- rbm(x, num_hidden=layers[[1]], retx=TRUE, ...)
+  rbm_list[[1]] <- rbm(x, num_hidden=layers[[1]], learning_rate=learning_rate[[1]], retx=TRUE, ...)
 
   #Fit the rest of the RBMs
   for(i in 2:length(rbm_list)){
     if(verbose_stack){print(paste('Fitting RBM', i))}
-    rbm_list[[i]] <- rbm(predict(rbm_list[[i-1]], type='probs', omit_bias=TRUE), num_hidden=layers[[i]], retx=TRUE, ...)
+    rbm_list[[i]] <- rbm(predict(rbm_list[[i-1]], type='probs', omit_bias=TRUE), num_hidden=layers[[i]], learning_rate=learning_rate[[i]], retx=TRUE, ...)
   }
   
   #Return result
