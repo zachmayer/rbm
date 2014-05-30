@@ -115,10 +115,8 @@ rbm <- function (x, num_hidden = 10, max_epochs = 1000, learning_rate = 0.1, use
   weights = Matrix(weights, sparse=TRUE)
   
   # Insert bias units of 1 into the first column.
-  dimnames(weights) = list(colnames(x), c('Bias_Unit', paste('Hidden', 1:num_hidden, sep='_')))
-  null_columns <- is.null(colnames(x))
   x <- cBind(Bias_Unit=1, x)
-  if(null_columns) colnames(x) <- NULL
+  dimnames(weights) = list(colnames(x), c('Bias_Unit', paste('Hidden', 1:num_hidden, sep='_')))
   
   #Fit the model
   x <- drop0(x)
@@ -247,8 +245,7 @@ predict.rbm <- function (object, newdata, type='probs', omit_bias=TRUE, ...) {
     if (!is.null(nm)) {
       if (!all(nm %in% colnames(newdata))) 
         stop("'newdata' does not have named columns matching one or more of the original columns")
-        warning('Column name selection is currenlty broken.  We\'re just keeping the data in the original column order for now')
-#       newdata <- newdata[, nm, drop = FALSE]
+      newdata <- newdata[, nm, drop = FALSE]
     }
     else {
       if (NCOL(newdata) != NROW(object$rotation)) 
