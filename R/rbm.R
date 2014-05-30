@@ -8,8 +8,6 @@
 #TODO: L1 and L2 regularization
 #TODO: Learning rate decay
 
-#TODO: LOTS OF ISSES IF THE COLUMNS ARE NOT NAMED!!! TESTS
-
 #' Fit a Restricted Boltzmann Machine
 #' 
 #' This function fits an RBM to the input dataset.  It internally uses sparse matricies for faster matrix operations
