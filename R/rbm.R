@@ -8,6 +8,8 @@
 #TODO: L1 and L2 regularization
 #TODO: Learning rate decay
 
+#TODO: LOTS OF ISSES IF THE COLUMNS ARE NOT NAMED!!! TESTS
+
 #' Fit a Restricted Boltzmann Machine
 #' 
 #' This function fits an RBM to the input dataset.  It internally uses sparse matricies for faster matrix operations
@@ -113,8 +115,10 @@ rbm <- function (x, num_hidden = 10, max_epochs = 1000, learning_rate = 0.1, use
   weights = Matrix(weights, sparse=TRUE)
   
   # Insert bias units of 1 into the first column.
-  x <- cBind(Bias_Unit=1, x)
   dimnames(weights) = list(colnames(x), c('Bias_Unit', paste('Hidden', 1:num_hidden, sep='_')))
+  null_columns <- is.null(colnames(x))
+  x <- cBind(Bias_Unit=1, x)
+  if(null_columns) colnames(x) <- NULL
   
   #Fit the model
   x <- drop0(x)
@@ -243,7 +247,8 @@ predict.rbm <- function (object, newdata, type='probs', omit_bias=TRUE, ...) {
     if (!is.null(nm)) {
       if (!all(nm %in% colnames(newdata))) 
         stop("'newdata' does not have named columns matching one or more of the original columns")
-      newdata <- newdata[, nm, drop = FALSE]
+        warning('Column name selection is currenlty broken.  We\'re just keeping the data in the original column order for now')
+#       newdata <- newdata[, nm, drop = FALSE]
     }
     else {
       if (NCOL(newdata) != NROW(object$rotation)) 

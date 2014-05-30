@@ -25,6 +25,8 @@
 stacked_rbm <- function (x, layers = c(30, 100, 30), learning_rate=0.1, verbose_stack=TRUE, use_gpu=FALSE, ...) {
   stopifnot(require('Matrix'))
   
+  #TODO: FIX BUG WHEN FIRST LAYER IS 1!!
+  
   if(use_gpu){
     if(require('gputools')){
       rbm <- rbm_gpu
