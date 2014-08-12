@@ -91,6 +91,24 @@ rbm <- function (x, num_hidden = 10, max_epochs = 1000, learning_rate = 0.1, use
     stop('Unsupported class for rmb: ', paste(class(x), collapse=', '))
   }
   
+  if (max(x) > 1 | min(x) <0){
+    warning("x is out of bounds, automatically scaling to 0-1, test data will be scaled as well")
+    scaled <- {}
+    scaled$min <- apply(x, 2, min)
+    scaled$max <- apply(x, 2, max)
+    scaled$scaled <- apply(x, 2, function(x) ifelse (max(x) > 1 | min(x) < 0, 1, 0))
+    
+    apply(x, 2, function(x) if (max(x) > 1 | min(x) < 0) {
+      x <- (x + abs(min(x)))/ (abs(min(x)) + abs(max(x)))
+      return (x)
+    } else {
+      return (x)
+    })
+  } else{
+    scaled <- {}
+  }
+  
+  
   stopifnot(is.numeric(momentum))
   stopifnot(momentum >= 0 & momentum <=1)
   if(momentum>0){warning('Momentum > 0 not yet implemented.  Ignoring momentum')}
@@ -102,6 +120,8 @@ rbm <- function (x, num_hidden = 10, max_epochs = 1000, learning_rate = 0.1, use
   if(is.null(activation_function)){
     activation_function <- function(x){1.0 / (1 + exp(-x))}
   }
+  
+  #Check if greater than 1
   
   # Initialize a weight matrix, of dimensions (num_visible x num_hidden), using
   # a Gaussian distribution with mean 0 and standard deviation 0.1.
@@ -175,7 +195,7 @@ rbm <- function (x, num_hidden = 10, max_epochs = 1000, learning_rate = 0.1, use
   } else {
     output_x <- NULL
   }
-  out <- list(rotation=weights, activation_function=activation_function, x=output_x, error=error_stream, max_epochs=max_epochs)
+  out <- list(rotation=weights, activation_function=activation_function, x=output_x, error=error_stream, max_epochs=max_epochs, scaled = scaled)
   class(out) <- 'rbm'
   return(out)
 }
@@ -235,7 +255,14 @@ predict.rbm <- function (object, newdata, type='probs', omit_bias=TRUE, ...) {
     } else if(attr(class(newdata), 'package') != 'Matrix'){
       stop('Unsupported class for rmb: ', paste(class(newdata), collapse=', '))
     }
-    
+    #Scale if scaled during training
+    if (!is.null(object$scaled)) {
+      for (i in 1:length(object$scaled$scaled)){
+        if (scaled$scaled[i] == 1){
+          newdata[,i] <- (newdata[,i] + abs(object$scaled$min[i]))/(abs(object$scaled$min[i]) + abs(object$scaled$max[i]))
+        }
+      }
+    }
     # Insert bias units of 1 into the first column.
     newdata <- cBind(Bias_Unit=rep(1, nrow(newdata)), newdata)
     
