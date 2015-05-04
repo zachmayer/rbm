@@ -21,6 +21,7 @@
 #' @param ... not used
 #' @export
 #' @return a rbm object
+#' @import methods
 #' @importFrom Matrix Matrix cBind drop0
 #' @importMethodsFrom Matrix %*% crossprod tcrossprod
 #' @references
@@ -198,6 +199,7 @@ rbm_gpu <- function (x, num_hidden = 10, max_epochs = 1000, learning_rate = 0.1,
 #' @param type a character vector specifying whether to return the hidden unit activations, hidden unit probs, or hidden unit states.  Activations or probabilities are typically the most useful if you wish to use the RBM features as input to another predictive model (or another RBM!).  Note that the hidden states are stochastic, and may be different each time you run the predict function, unless you set random.seed() before making predictions.  Activations and states are non-stochastic, and will be the same each time you run predict.
 #' @param omit_bias Don't return the bias column in the prediciton matrix.
 #' @param ... not used
+#' @import methods
 #' @importFrom Matrix Matrix cBind drop0
 #' @importMethodsFrom Matrix %*% crossprod tcrossprod
 #' @export
