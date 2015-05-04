@@ -6,21 +6,25 @@ language: c
 env:
    global:
      - WARNINGS_ARE_ERRORS=1
-     - R_BUILD_ARGS=" "
-     - R_CHECK_ARGS="--as-cran"
-     - BOOTSTRAP_LATEX="1"
+     - R_BUILD_ARGS="--no-manual"
+     - R_CHECK_ARGS="--no-manual --as-cran"
+     - _R_CHECK_FORCE_SUGGESTS_="false"
+     
    matrix:
      - NOT_CRAN="true"
      - NOT_CRAN="false"
 
+r_github_packages:
+  - jimhester/covr
+
 before_install:
+#http://www.r-tutor.com/gpu-computing/cuda-installation/cuda7.0-ubuntu
   - curl -OL http://raw.github.com/craigcitro/r-travis/master/scripts/travis-tool.sh
   - chmod 755 ./travis-tool.sh
   - ./travis-tool.sh bootstrap
 
 install:
   - ./travis-tool.sh install_deps
-  - ./travis-tool.sh github_package jimhester/covr
 
 script: ./travis-tool.sh run_tests
 
