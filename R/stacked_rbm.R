@@ -108,7 +108,11 @@ predict.stacked_rbm <- function (object, newdata, type='probs', omit_bias=TRUE, 
     }
     hidden_probs <- predict(object$rbm_list[[1]], newdata=newdata, type='probs', omit_bias=TRUE)
     for(i in 2:length(object$rbm_list)){
-      hidden_probs <- predict(object$rbm_list[[i]], newdata=hidden_probs, type='probs', omit_bias=TRUE)
+      omit_bias_in_loop <- TRUE
+      if(i==length(object$rbm_list)){
+        omit_bias_in_loop <- omit_bias #For the last RBM, use the user_specified omit_bias
+      }
+      hidden_probs <- predict(object$rbm_list[[i]], newdata=hidden_probs, type='probs', omit_bias=omit_bias_in_loop)
     }
   }
 
@@ -122,17 +126,26 @@ predict.stacked_rbm <- function (object, newdata, type='probs', omit_bias=TRUE, 
     }
   }
 
-  if(omit_bias){
-    if(type=='probs'){return(hidden_probs)}
-    hidden_states <- hidden_probs > Matrix(runif(nrow(hidden_probs)*ncol(hidden_probs)), nrow=nrow(hidden_probs), ncol=ncol(hidden_probs))
-    return(hidden_states)
-  } else{
-    if(type=='probs'){return(hidden_probs)}
-    rows <- nrow(object$rotation) #Not sure about this one.  rows wasn't defined, so I'm trying to fix it
-    hidden_states <- hidden_probs > Matrix(runif(rows*ncol(object$rotation)), nrow=rows, ncol=ncol(object$rotation))
-    return(hidden_states)
-  }
+  rows <- nrow(hidden_probs)
+  cols <- ncol(hidden_probs)
 
+  if(omit_bias){
+    if(type=='probs'){
+      return(hidden_probs)
+    }
+    else if(type == 'states'){
+      hidden_states <- hidden_probs > Matrix(runif(rows*cols), nrow=rows, ncol=cols)
+      return(hidden_states)
+    }
+  } else{
+    if(type=='probs'){
+      return(hidden_probs)
+    }
+    else if(type == 'states'){
+      hidden_states <- hidden_probs > Matrix(runif(rows*cols), nrow=rows, ncol=cols)
+      return(hidden_states)
+    }
+  }
 }
 
 #' Combine weights from a Stacked Restricted Boltzmann Machine

@@ -38,7 +38,7 @@ test_that("Single RBMs work correctly", {
     a = list(x=george_reviews, num_hidden=1, max_epochs=10, use_mini_batches = TRUE, retx=TRUE, verbose=TRUE, batch_size=1)
   )){
     model <- do.call(rbm, args)
-
+    rm(args)
     for(pred_args in list(
       a = list(object=model, newdata=george_reviews, type='activations', omit_bias=TRUE),
       b = list(object=model, newdata=george_reviews, type='probs', omit_bias=TRUE),
@@ -53,6 +53,7 @@ test_that("Single RBMs work correctly", {
       e = list(object=model, newdata=movie_reviews, type='probs', omit_bias=FALSE),
       f = list(object=model, newdata=movie_reviews, type='states', omit_bias=FALSE)
     )){
+
       p <- do.call(predict, pred_args)
       if(pred_args$type == 'activations'){
         expect_is(p@x, 'numeric')
@@ -63,13 +64,14 @@ test_that("Single RBMs work correctly", {
       if(pred_args$type == 'states'){
         expect_is(p@x, 'logical')
       }
-    }
 
-    if(pred_args$omit_bias == TRUE){
-      expect_equal(dim(p), c(nrow(pred_args$newdata), ncol(pred_args$object$rotation) - 1))
-    }
-    if(pred_args$omit_bias == FALSE){
-      expect_equal(dim(p), c(nrow(pred_args$newdata), ncol(pred_args$object$rotation)))
+      if(pred_args$omit_bias == TRUE){
+        expect_identical(as.numeric(dim(p)), as.numeric(c(nrow(pred_args$newdata), ncol(pred_args$object$rotation) - 1)))
+      }
+      if(pred_args$omit_bias == FALSE){
+        expect_identical(as.numeric(dim(p)), as.numeric(c(nrow(pred_args$newdata), ncol(pred_args$object$rotation))))
+      }
+      rm(pred_args)
     }
   }
 })
