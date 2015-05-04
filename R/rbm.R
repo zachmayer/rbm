@@ -52,7 +52,7 @@
 #'
 #' #Fit a PCA model and an RBM model
 #' PCA <- prcomp(movie_reviews, retx=TRUE)
-#' RBM <- rbm(movie_reviews, retx=TRUE)
+#' RBM <- rbm(movie_reviews, retx=TRUE, max_epoch=500)
 #'
 #' #Examine the 2 models
 #' round(PCA$rotation, 2) #PCA weights
@@ -67,7 +67,7 @@
 #' #Predict for existing data
 #' predict(PCA)
 #' predict(RBM, type='probs')
-rbm <- function (x, num_hidden = 10, max_epochs = 1000, learning_rate = 0.1, use_mini_batches = FALSE, batch_size = 250, initial_weights_mean = 0, initial_weights_sd = 0.1, momentum = 0, dropout = FALSE, dropout_pct = .50, retx = FALSE, activation_function=NULL, verbose = FALSE, ...) {
+rbm <- function (x, num_hidden = 10, max_epochs = 1000, learning_rate = 0.1, use_mini_batches = TRUE, batch_size = 250, initial_weights_mean = 0, initial_weights_sd = 0.1, momentum = 0, dropout = FALSE, dropout_pct = .50, retx = FALSE, activation_function=NULL, verbose = FALSE, ...) {
 
   #Checks
   stopifnot(length(dim(x)) == 2)
@@ -85,6 +85,10 @@ rbm <- function (x, num_hidden = 10, max_epochs = 1000, learning_rate = 0.1, use
     stop('Unsupported class for rmb: ', paste(class(x), collapse=', '))
   } else if(attr(class(x), 'package') != 'Matrix'){
     stop('Unsupported class for rmb: ', paste(class(x), collapse=', '))
+  }
+  if(use_mini_batches & nrow(x) < batch_size){
+    warning(paste0('Batch size (', batch_size, ') less than rows in x (', nrow(x), '). Re-setting batch size to nrow(x)'))
+    batch_size <- nrow(x)
   }
 
   x_range <- range(x)
@@ -130,7 +134,7 @@ rbm <- function (x, num_hidden = 10, max_epochs = 1000, learning_rate = 0.1, use
     #Sample mini-batch
     if(use_mini_batches){
       train_rows = sample(1:nrow(x), batch_size, replace=TRUE)
-      x_sample = x[train_rows,]
+      x_sample = x[train_rows,,drop=FALSE]
     } else {
       x_sample = x
     }
@@ -273,11 +277,11 @@ predict.rbm <- function (object, newdata, type='probs', omit_bias=TRUE, ...) {
   }
 
   if(omit_bias){
-    if(type=='activations'){return(hidden_activations[,-1])}
+    if(type=='activations'){return(hidden_activations[,-1,drop=FALSE])}
     hidden_probs <- object$activation_function(hidden_activations)
-    if(type=='probs'){return(hidden_probs[,-1])}
+    if(type=='probs'){return(hidden_probs[,-1,drop=FALSE])}
     hidden_states <- hidden_probs > Matrix(runif(rows*ncol(object$rotation)), nrow=rows, ncol=ncol(object$rotation))
-    return(hidden_states[,-1])
+    return(hidden_states[,-1,drop=FALSE])
   } else{
     if(type=='activations'){return(hidden_activations)}
     hidden_probs <- object$activation_function(hidden_activations)

@@ -5,7 +5,7 @@
 \title{Fit a Restricted Boltzmann Machine}
 \usage{
 rbm(x, num_hidden = 10, max_epochs = 1000, learning_rate = 0.1,
-  use_mini_batches = FALSE, batch_size = 250, initial_weights_mean = 0,
+  use_mini_batches = TRUE, batch_size = 250, initial_weights_mean = 0,
   initial_weights_sd = 0.1, momentum = 0, dropout = FALSE,
   dropout_pct = 0.5, retx = FALSE, activation_function = NULL,
   verbose = FALSE, ...)
@@ -58,7 +58,7 @@ data(george_reviews)
 
 #Fit a PCA model and an RBM model
 PCA <- prcomp(movie_reviews, retx=TRUE)
-RBM <- rbm(movie_reviews, retx=TRUE)
+RBM <- rbm(movie_reviews, retx=TRUE, max_epoch=500)
 
 #Examine the 2 models
 round(PCA$rotation, 2) #PCA weights
