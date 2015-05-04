@@ -26,8 +26,8 @@ before_install:
 install:
 #http://www.r-tutor.com/gpu-computing/cuda-installation/cuda7.0-ubuntu
   - ./travis-tool.sh install_deps
-  - sudo dpkg -i cuda-repo-ubuntu1404_7.0-28_amd64.deb 
-  - sudo apt-get update
+  - ./travis-tool.sh dpkgcurl_install cuda-repo-ubuntu1404_7.0-28_amd64.deb 
+  - sudo apt-get -y update
   - ./travis-tool.sh aptget_install cuda
   - ./travis-tool.sh github_package jimhester/covr
   - ./travis-tool.sh github_package nullsatz/gputools
