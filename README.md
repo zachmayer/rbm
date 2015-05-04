@@ -5,6 +5,6 @@ Restricted Boltzmann Machines in R
 
 To install the latest development version from github:
 ```{R}
-devtools::install_github('zachmayer/rbm@dev')
+devtools::install_github('zachmayer/rbm')
 ```
 
