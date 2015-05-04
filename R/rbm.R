@@ -207,8 +207,8 @@ rbm <- function (x, num_hidden = 10, max_epochs = 1000, learning_rate = 0.1, use
 #' @param x a RBM object
 #' @param ... not used
 #' @export
-print.rbm <- function (object, ...) {
-  print(object$rotation) 
+print.rbm <- function (x, ...) {
+  print(x$rotation) 
 }
 
 #' Plot method for a Restricted Boltzmann Machine
@@ -218,8 +218,8 @@ print.rbm <- function (object, ...) {
 #' @param x a RBM object
 #' @param ... not used
 #' @export
-plot.rbm <- function (object, ...) {
-  plot(object$error, ...) 
+plot.rbm <- function (x, ...) {
+  plot(x$error, ...) 
 }
 
 #' Predict from a Restricted Boltzmann Machine
