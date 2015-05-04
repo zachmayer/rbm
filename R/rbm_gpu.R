@@ -243,11 +243,11 @@ predict.rbm_gpu <- function (object, newdata, type='probs', omit_bias=TRUE, ...)
   }
 
   if(omit_bias){
-    if(type=='activations'){return(hidden_activations[,-1])}
+    if(type=='activations'){return(hidden_activations[,-1,drop=FALSE])}
     hidden_probs <- object$activation_function(hidden_activations)
-    if(type=='probs'){return(hidden_probs[,-1])}
+    if(type=='probs'){return(hidden_probs[,-1,drop=FALSE])}
     hidden_states <- hidden_probs > matrix(runif(rows*ncol(object$rotation)), nrow=rows, ncol=ncol(object$rotation))
-    return(hidden_states[,-1])
+    return(hidden_states[,-1,drop=FALSE])
   } else{
     if(type=='activations'){return(hidden_activations)}
     hidden_probs <- object$activation_function(hidden_activations)

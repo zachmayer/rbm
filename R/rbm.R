@@ -130,7 +130,7 @@ rbm <- function (x, num_hidden = 10, max_epochs = 1000, learning_rate = 0.1, use
     #Sample mini-batch
     if(use_mini_batches){
       train_rows = sample(1:nrow(x), batch_size, replace=TRUE)
-      x_sample = x[train_rows,]
+      x_sample = x[train_rows,,drop=FALSE]
     } else {
       x_sample = x
     }
@@ -273,11 +273,11 @@ predict.rbm <- function (object, newdata, type='probs', omit_bias=TRUE, ...) {
   }
 
   if(omit_bias){
-    if(type=='activations'){return(hidden_activations[,-1])}
+    if(type=='activations'){return(hidden_activations[,-1,drop=FALSE])}
     hidden_probs <- object$activation_function(hidden_activations)
-    if(type=='probs'){return(hidden_probs[,-1])}
+    if(type=='probs'){return(hidden_probs[,-1,drop=FALSE])}
     hidden_states <- hidden_probs > Matrix(runif(rows*ncol(object$rotation)), nrow=rows, ncol=ncol(object$rotation))
-    return(hidden_states[,-1])
+    return(hidden_states[,-1,drop=FALSE])
   } else{
     if(type=='activations'){return(hidden_activations)}
     hidden_probs <- object$activation_function(hidden_activations)
