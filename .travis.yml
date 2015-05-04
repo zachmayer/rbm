@@ -21,6 +21,7 @@ before_install:
 install:
   - ./travis-tool.sh install_deps
   - ./travis-tool.sh github_package jimhester/covr
+  - ./travis-tool.sh github_package nullsatz/gputools
 
 script: ./travis-tool.sh run_tests
 
