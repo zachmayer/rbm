@@ -1,7 +1,7 @@
 Package: rbm
 Type: Package
 Title: Restricted Boltzmann Machines
-Version: 0.1.0.1105
+Version: 0.1.0.1100
 Date: 2015-02-09
 Author: Zach Mayer
 Maintainer: Zach Mayer <zach.mayer@gmail.com>
