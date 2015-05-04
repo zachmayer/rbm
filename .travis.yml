@@ -9,13 +9,10 @@ env:
      - R_BUILD_ARGS="--no-manual"
      - R_CHECK_ARGS="--no-manual --as-cran"
      - _R_CHECK_FORCE_SUGGESTS_="false"
-     
+
    matrix:
      - NOT_CRAN="true"
      - NOT_CRAN="false"
-
-r_github_packages:
-  - jimhester/covr
 
 before_install:
 #http://www.r-tutor.com/gpu-computing/cuda-installation/cuda7.0-ubuntu
@@ -25,6 +22,7 @@ before_install:
 
 install:
   - ./travis-tool.sh install_deps
+  - ./travis-tool.sh github_package jimhester/covr
 
 script: ./travis-tool.sh run_tests
 
