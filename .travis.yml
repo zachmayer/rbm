@@ -21,16 +21,10 @@ before_install:
 #http://www.r-tutor.com/gpu-computing/cuda-installation/cuda7.0-ubuntu
   - curl -OL http://raw.github.com/craigcitro/r-travis/master/scripts/travis-tool.sh
   - chmod 755 ./travis-tool.sh
-  - ./travis-tool.sh dpkgcurl_install http://developer.download.nvidia.com/compute/cuda/repos/ubuntu1204/x86_64/cuda-repo-ubuntu1204_7.0-28_amd64.deb
   - ./travis-tool.sh bootstrap
 
 install:
   - ./travis-tool.sh install_deps
-  - ./travis-tool.sh aptget_install cuda
-  - export CUDA_HOME=/usr/local/cuda-7.0 
-  - export LD_LIBRARY_PATH=${CUDA_HOME}/lib64 
-  - PATH=${CUDA_HOME}/bin:${PATH}
-  - export PATH
 
 script: ./travis-tool.sh run_tests
 
