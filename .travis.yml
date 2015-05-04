@@ -9,10 +9,6 @@ env:
      - R_BUILD_ARGS=" "
      - R_CHECK_ARGS="--as-cran"
      - BOOTSTRAP_LATEX="1"
-     - export CUDA_HOME=/usr/local/cuda-7.0 
-     - export LD_LIBRARY_PATH=${CUDA_HOME}/lib64 
-     - PATH=${CUDA_HOME}/bin:${PATH}
-     - export PATH
      
    matrix:
      - NOT_CRAN="true"
@@ -31,6 +27,10 @@ before_install:
 install:
   - ./travis-tool.sh install_deps
   - ./travis-tool.sh aptget_install cuda
+  - export CUDA_HOME=/usr/local/cuda-7.0 
+  - export LD_LIBRARY_PATH=${CUDA_HOME}/lib64 
+  - PATH=${CUDA_HOME}/bin:${PATH}
+  - export PATH
 
 script: ./travis-tool.sh run_tests
 
