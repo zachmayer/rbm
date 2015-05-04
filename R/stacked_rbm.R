@@ -1,5 +1,5 @@
 #' Fit a Stack of Restricted Boltzmann Machines
-#' 
+#'
 #' @param x a sparse matrix
 #' @param layers an integer vector of the number of neurons in each RBM
 #' @param ... passed to the rbm function
@@ -20,26 +20,26 @@
 #' Eric <- c('Harry_Potter' = 0, Avatar = 0, 'LOTR3' = 1, Gladiator = 1, Titanic = 0, Glitter = 0) #Oscar winners fan, except for Titanic.
 #' Fred <- c('Harry_Potter' = 0, Avatar = 0, 'LOTR3' = 1, Gladiator = 1, Titanic = 1, Glitter = 0) #Big Oscar winners fan.
 #' dat <- rbind(Alice, Bob, Carol, David, Eric, Fred)
-#' 
+#'
 #' Stacked_RBM <- stacked_rbm(dat)
 stacked_rbm <- function (x, layers = c(30, 100, 30), learning_rate=0.1, verbose_stack=TRUE, use_gpu=FALSE, ...) {
   stopifnot(require('Matrix'))
-  
+
   if(use_gpu){
     if(require('gputools')){
       rbm <- rbm_gpu
     } else {
-     warning('The gputools package is require to train RBMs on the gpu.  RBMs will be trained on the cpu instead.') 
+     warning('The gputools package is require to train RBMs on the gpu.  RBMs will be trained on the cpu instead.')
     }
   }
-  
+
   #Checks
   stopifnot(length(dim(x)) == 2)
   if(length(learning_rate)==1){
     learning_rate <- rep(learning_rate, length(layers))
   }
   stopifnot(length(layers) == length(learning_rate))
-  
+
   if(any('data.frame' %in% class(x))){
     if(any(!sapply(x, is.finite))){
       stop('x must be all finite.  rbm does not handle NAs, NaNs, Infs or -Infs')
@@ -55,11 +55,11 @@ stacked_rbm <- function (x, layers = c(30, 100, 30), learning_rate=0.1, verbose_
   } else if(attr(class(x), 'package') != 'Matrix'){
     stop('Unsupported class for rmb: ', paste(class(x), collapse=', '))
   }
-  
+
   if(length(layers) < 2){
     stop('Please use the rbm function to fit a single rbm')
   }
-  
+
   #Fit first RBM
   if(verbose_stack){print('Fitting RBM 1')}
   rbm_list <- as.list(layers)
@@ -70,7 +70,7 @@ stacked_rbm <- function (x, layers = c(30, 100, 30), learning_rate=0.1, verbose_
     if(verbose_stack){print(paste('Fitting RBM', i))}
     rbm_list[[i]] <- rbm(predict(rbm_list[[i-1]], type='probs', omit_bias=TRUE), num_hidden=layers[[i]], learning_rate=learning_rate[[i]], retx=TRUE, ...)
   }
-  
+
   #Return result
   out <- list(rbm_list=rbm_list, layers=layers, activation_function=rbm_list[[1]]$activation_function)
   class(out) <- 'stacked_rbm'
@@ -78,9 +78,9 @@ stacked_rbm <- function (x, layers = c(30, 100, 30), learning_rate=0.1, verbose_
 }
 
 #' Predict from a Stacked Restricted Boltzmann Machine
-#' 
+#'
 #' This function takes a stacked RBM and a matrix of new data, and predicts for the new data with the RBM.
-#' 
+#'
 #' @param x a RBM object
 #' @param newdata a sparse matrix of new data
 #' @param type a character vector specifying whether to return the hidden unit activations, hidden unit probs, or hidden unit states.  Activations or probabilities are typically the most useful if you wish to use the RBM features as input to another predictive model (or another RBM!).  Note that the hidden states are stochastic, and may be different each time you run the predict function, unless you set random.seed() before making predictions.  Activations and states are non-stochastic, and will be the same each time you run predict.
@@ -112,13 +112,13 @@ predict.stacked_rbm <- function (object, newdata, type='probs', omit_bias=TRUE, 
     hidden_states <- hidden_probs > Matrix(runif(rows*ncol(object$rotation)), nrow=rows, ncol=ncol(object$rotation))
     return(hidden_states)
   }
-  
+
 }
 
 #' Combine weights from a Stacked Restricted Boltzmann Machine
-#' 
+#'
 #' This function takes a stacked RBM and returns the combined weight matrix
-#' 
+#'
 #' @param x a RBM object
 #' @param layer which RBM to return weights for (usually the final RBM, which will combine all 3 RBMs into a single weight matrix)
 #' @param ... not used
