@@ -69,12 +69,19 @@ stacked_rbm <- function (x, layers = c(30, 100, 30), learning_rate=0.1, verbose_
   #Fit first RBM
   if(verbose_stack){print('Fitting RBM 1')}
   rbm_list <- as.list(layers)
+  if(verbose_stack){message(paste('Input dims:', paste(dim(x), collapse=', ')))}
+  if(verbose_stack){message(paste('Input class:', paste(class(x), collapse=', ')))}
   rbm_list[[1]] <- rbm(x, num_hidden=layers[[1]], learning_rate=learning_rate[[1]], retx=TRUE, ...)
 
   #Fit the rest of the RBMs
+  #Do we train on the returned x dataset?
+  #Or should we just train on the rotation matrix (would be MUCH quicker for large datasets)
   for(i in 2:length(rbm_list)){
-    if(verbose_stack){print(paste('Fitting RBM', i))}
-    rbm_list[[i]] <- rbm(predict(rbm_list[[i-1]], type='probs', omit_bias=TRUE), num_hidden=layers[[i]], learning_rate=learning_rate[[i]], retx=TRUE, ...)
+    if(verbose_stack){message(paste('Fitting RBM', i))}
+    new_train <- predict(rbm_list[[i-1]], type='probs', omit_bias=TRUE)
+    if(verbose_stack){message(paste('Input dims:', paste(dim(new_train), collapse=', ')))}
+    if(verbose_stack){message(paste('Input class:', paste(class(new_train), collapse=', ')))}
+    rbm_list[[i]] <- rbm(new_train, num_hidden=layers[[i]], learning_rate=learning_rate[[i]], retx=TRUE, ...)
   }
 
   #Return result
