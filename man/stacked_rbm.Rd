@@ -44,7 +44,7 @@ Eric <- c('Harry_Potter' = 0, Avatar = 0, 'LOTR3' = 1, Gladiator = 1, Titanic = 
 Fred <- c('Harry_Potter' = 0, Avatar = 0, 'LOTR3' = 1, Gladiator = 1, Titanic = 1, Glitter = 0)
 dat <- rbind(Alice, Bob, Carol, David, Eric, Fred)
 
-Stacked_RBM <- stacked_rbm(dat)
+Stacked_RBM <- stacked_rbm(dat, layers = c(3, 3), max_epochs=25)
 }
 \references{
 \itemize{
