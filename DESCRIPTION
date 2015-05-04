@@ -1,13 +1,14 @@
 Package: rbm
 Type: Package
 Title: Restricted Boltzmann Machines
-Version: 0.1.0.1000
+Version: 0.1.0.1100
 Date: 2015-02-09
 Author: Zach Mayer
 Maintainer: Zach Mayer <zach.mayer@gmail.com>
 Description: This package implements Restricted Boltzmann Machines
 Depends:
-    R (>= 2.15.0),
+    R (>= 2.15.0)
+Imports:
     Matrix
 Suggests:
     gputools,

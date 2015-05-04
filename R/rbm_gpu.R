@@ -6,20 +6,23 @@
 #'
 #' @param x a sparse matrix
 #' @param num_hidden number of neurons in the hidden layer
-#' @param max_epochs
-#' @param learning_rate
-#' @param use_mini_batches
-#' @param batch_size
-#' @param initial_weights_mean
-#' @param initial_weights_sd
-#' @param momentum
-#' @param dropout
+#' @param max_epochs Maximum learning epochs
+#' @param learning_rate Learning Rate
+#' @param use_mini_batches Use sub-samples for training for each iteration.  This usually results in MUCH faster learning.
+#' @param batch_size Sample size for mini batches
+#' @param initial_weights_mean Mean of initial random weights
+#' @param initial_weights_sd Standard deviation of initial random weights
+#' @param momentum Use momentum when learning.  (Helps move faster through "half pipe" shaped regions).
+#' @param dropout Use dropout when learning (sort of a form of regularization).
+#' @param dropout_pct What percent of neurons to drop out (0 to 1)
 #' @param retx whether to return the RBM predictions for the input data
-#' @param verbose
+#' @param verbose Print lots of messages while training
 #' @param activation_function function to convert hidden activations (-Inf, Inf) to hidden probabilities [0, 1].  Must be able to operate on sparse "Matrix" objects.
 #' @param ... not used
 #' @export
 #' @return a rbm object
+#' @importFrom Matrix Matrix cBind drop0
+#' @importMethodsFrom Matrix %*% crossprod tcrossprod
 #' @references
 #' \itemize{
 #' \item \url{http://blog.echen.me/2011/07/18/introduction-to-restricted-boltzmann-machines}
@@ -35,12 +38,18 @@
 #' #Setup a dataset
 #' set.seed(10)
 #' print('Data from: https://github.com/echen/restricted-boltzmann-machines')
-#' Alice <- c('Harry_Potter' = 1, Avatar = 1, 'LOTR3' = 1, Gladiator = 0, Titanic = 0, Glitter = 0) #Big SF/fantasy fan.
-#' Bob <- c('Harry_Potter' = 1, Avatar = 0, 'LOTR3' = 1, Gladiator = 0, Titanic = 0, Glitter = 0) #SF/fantasy fan, but doesn't like Avatar.
-#' Carol <- c('Harry_Potter' = 1, Avatar = 1, 'LOTR3' = 1, Gladiator = 0, Titanic = 0, Glitter = 0) #Big SF/fantasy fan.
-#' David <- c('Harry_Potter' = 0, Avatar = 0, 'LOTR3' = 1, Gladiator = 1, Titanic = 1, Glitter = 0) #Big Oscar winners fan.
-#' Eric <- c('Harry_Potter' = 0, Avatar = 0, 'LOTR3' = 1, Gladiator = 1, Titanic = 0, Glitter = 0) #Oscar winners fan, except for Titanic.
-#' Fred <- c('Harry_Potter' = 0, Avatar = 0, 'LOTR3' = 1, Gladiator = 1, Titanic = 1, Glitter = 0) #Big Oscar winners fan.
+#' #Big SF/fantasy fan.
+#' Alice <- c('Harry_Potter' = 1, Avatar = 1, 'LOTR3' = 1, Gladiator = 0, Titanic = 0, Glitter = 0)
+#' #SF/fantasy fan, but doesn't like Avatar.
+#' Bob <- c('Harry_Potter' = 1, Avatar = 0, 'LOTR3' = 1, Gladiator = 0, Titanic = 0, Glitter = 0)
+#' #Big SF/fantasy fan.
+#' Carol <- c('Harry_Potter' = 1, Avatar = 1, 'LOTR3' = 1, Gladiator = 0, Titanic = 0, Glitter = 0)
+#' #Big Oscar winners fan.
+#' David <- c('Harry_Potter' = 0, Avatar = 0, 'LOTR3' = 1, Gladiator = 1, Titanic = 1, Glitter = 0)
+#' #Oscar winners fan, except for Titanic.
+#' Eric <- c('Harry_Potter' = 0, Avatar = 0, 'LOTR3' = 1, Gladiator = 1, Titanic = 0, Glitter = 0)
+#' #Big Oscar winners fan.
+#' Fred <- c('Harry_Potter' = 0, Avatar = 0, 'LOTR3' = 1, Gladiator = 1, Titanic = 1, Glitter = 0)
 #' dat <- rbind(Alice, Bob, Carol, David, Eric, Fred)
 #'
 #' #Fit a PCA model and an RBM model
@@ -84,6 +93,14 @@ rbm_gpu <- function (x, num_hidden = 10, max_epochs = 1000, learning_rate = 0.1,
     stop('Unsupported class for rmb: ', paste(class(x), collapse=', '))
   } else if(attr(class(x), 'package') != 'Matrix'){
     stop('Unsupported class for rmb: ', paste(class(x), collapse=', '))
+  }
+
+  x_range <- range(x)
+  scaled <- FALSE
+  if (x_range[1] <0 | x_range[2] > 1){
+    warning("x is out of bounds, automatically scaling to 0-1, test data will be scaled as well")
+    x <- (x - x_range[1]) / (x_range[2] - x_range[1])
+    scaled <- TRUE
   }
 
   stopifnot(is.numeric(momentum))
@@ -168,7 +185,7 @@ rbm_gpu <- function (x, num_hidden = 10, max_epochs = 1000, learning_rate = 0.1,
   } else {
     output_x <- NULL
   }
-  out <- list(rotation=weights, activation_function=activation_function, x=output_x, error=error_stream, max_epochs=max_epochs)
+  out <- list(rotation=weights, activation_function=activation_function, x=output_x, error=error_stream, max_epochs=max_epochs, x_range=x_range, scaled=scaled)
   class(out) <- c('rbm_gpu', 'rbm')
   return(out)
 }
@@ -176,10 +193,13 @@ rbm_gpu <- function (x, num_hidden = 10, max_epochs = 1000, learning_rate = 0.1,
 #' Predict from a Restricted Boltzmann Machine
 #'
 #' This function takes an RBM and a matrix of new data, and predicts for the new data with the RBM.
-#' @param x a RBM object
+#' @param object a RBM object
 #' @param newdata a sparse matrix of new data
 #' @param type a character vector specifying whether to return the hidden unit activations, hidden unit probs, or hidden unit states.  Activations or probabilities are typically the most useful if you wish to use the RBM features as input to another predictive model (or another RBM!).  Note that the hidden states are stochastic, and may be different each time you run the predict function, unless you set random.seed() before making predictions.  Activations and states are non-stochastic, and will be the same each time you run predict.
+#' @param omit_bias Don't return the bias column in the prediciton matrix.
 #' @param ... not used
+#' @importFrom Matrix Matrix cBind drop0
+#' @importMethodsFrom Matrix %*% crossprod tcrossprod
 #' @export
 #' @return a sparse matrix
 predict.rbm_gpu <- function (object, newdata, type='probs', omit_bias=TRUE, ...) {
@@ -204,6 +224,16 @@ predict.rbm_gpu <- function (object, newdata, type='probs', omit_bias=TRUE, ...)
       stop('Unsupported class for rmb: ', paste(class(newdata), collapse=', '))
     } else if(attr(class(newdata), 'package') != 'Matrix'){
       stop('Unsupported class for rmb: ', paste(class(newdata), collapse=', '))
+    }
+
+    #Scale if scaled during training
+    if (!is.null(object$scaled)) {
+      if(object$scaled){
+        newdata <- (newdata - object$x_range[1]) / (object$x_range[2] - object$x_range[1])
+      }
+      if(min(newdata) < 0 | max(newdata) > 1){
+        stop('newdata outside of the scale of the model training data.  Could not re-scale data to be 0-1')
+      }
     }
 
     # Insert bias units of 1 into the first column.
