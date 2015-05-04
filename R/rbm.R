@@ -101,7 +101,6 @@ rbm <- function (x, num_hidden = 10, max_epochs = 1000, learning_rate = 0.1, use
 
   x_range <- range(x)
   scaled <- FALSE
-
   if (x_range[1] <0 | x_range[2] > 1){
     warning("x is out of bounds, automatically scaling to 0-1, test data will be scaled as well")
     x <- (x - x_range[1]) / (x_range[2] - x_range[1])
@@ -194,7 +193,7 @@ rbm <- function (x, num_hidden = 10, max_epochs = 1000, learning_rate = 0.1, use
   } else {
     output_x <- NULL
   }
-  out <- list(rotation=weights, activation_function=activation_function, x=output_x, error=error_stream, max_epochs=max_epochs, x_range = x_range, scaled=scaled)
+  out <- list(rotation=weights, activation_function=activation_function, x=output_x, error=error_stream, max_epochs=max_epochs, x_range=x_range, scaled=scaled)
   class(out) <- 'rbm'
   return(out)
 }
@@ -256,12 +255,17 @@ predict.rbm <- function (object, newdata, type='probs', omit_bias=TRUE, ...) {
     } else if(attr(class(newdata), 'package') != 'Matrix'){
       stop('Unsupported class for rmb: ', paste(class(newdata), collapse=', '))
     }
+
     #Scale if scaled during training
     if (!is.null(object$scaled)) {
       if(object$scaled){
         newdata <- (newdata - object$x_range[1]) / (object$x_range[2] - object$x_range[1])
       }
+      if(min(newdata) < 0 | max(newdata) > 1){
+        stop('newdata outside of the scale of the model training data.  Could not re-scale data to be 0-1')
+      }
     }
+
     # Insert bias units of 1 into the first column.
     newdata <- cBind(Bias_Unit=rep(1, nrow(newdata)), newdata)
 

@@ -65,6 +65,14 @@ stacked_rbm <- function (x, layers = c(30, 100, 30), learning_rate=0.1, verbose_
     stop('Unsupported class for rmb: ', paste(class(x), collapse=', '))
   }
 
+  x_range <- range(x)
+  scaled <- FALSE
+  if (x_range[1] <0 | x_range[2] > 1){
+    warning("x is out of bounds, automatically scaling to 0-1, test data will be scaled as well")
+    x <- (x - x_range[1]) / (x_range[2] - x_range[1])
+    scaled <- TRUE
+  }
+
   if(length(layers) < 2){
     stop('Please use the rbm function to fit a single rbm')
   }
@@ -81,7 +89,7 @@ stacked_rbm <- function (x, layers = c(30, 100, 30), learning_rate=0.1, verbose_
   }
 
   #Return result
-  out <- list(rbm_list=rbm_list, layers=layers, activation_function=rbm_list[[1]]$activation_function)
+  out <- list(rbm_list=rbm_list, layers=layers, activation_function=rbm_list[[1]]$activation_function, x_range=x_range, scaled=scaled)
   class(out) <- 'stacked_rbm'
   return(out)
 }
@@ -111,6 +119,16 @@ predict.stacked_rbm <- function (object, newdata, type='probs', omit_bias=TRUE, 
     hidden_probs <- predict(object$rbm_list[[1]], newdata=newdata, type='probs', omit_bias=TRUE)
     for(i in 2:length(object$rbm_list)){
       hidden_probs <- predict(object$rbm_list[[i]], newdata=hidden_probs, type='probs', omit_bias=TRUE)
+    }
+  }
+
+  #Scale if scaled during training
+  if (!is.null(object$scaled)) {
+    if(object$scaled){
+      newdata <- (newdata - object$x_range[1]) / (object$x_range[2] - object$x_range[1])
+    }
+    if(min(newdata) < 0 | max(newdata) > 1){
+      stop('newdata outside of the scale of the model training data.  Could not re-scale data to be 0-1')
     }
   }
 
