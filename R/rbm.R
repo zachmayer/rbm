@@ -99,21 +99,13 @@ rbm <- function (x, num_hidden = 10, max_epochs = 1000, learning_rate = 0.1, use
     stop('Unsupported class for rmb: ', paste(class(x), collapse=', '))
   }
 
-  if (max(x) > 1 | min(x) <0){
-    warning("x is out of bounds, automatically scaling to 0-1, test data will be scaled as well")
-    scaled <- list()
-    scaled$min <- apply(x, 2, min)
-    scaled$max <- apply(x, 2, max)
-    scaled$scaled <- apply(x, 2, function(x) ifelse (max(x) > 1 | min(x) < 0, 1, 0))
+  x_range <- range(x)
+  scaled <- FALSE
 
-    apply(x, 2, function(x) if (max(x) > 1 | min(x) < 0) {
-      x <- (x + abs(min(x)))/ (abs(min(x)) + abs(max(x)))
-      return (x)
-    } else {
-      return (x)
-    })
-  } else{
-    scaled <- list()
+  if (x_range[1] <0 | x_range[2] > 1){
+    warning("x is out of bounds, automatically scaling to 0-1, test data will be scaled as well")
+    x <- (x - x_range[1]) / (x_range[2] - x_range[1])
+    scaled <- TRUE
   }
 
   stopifnot(is.numeric(momentum))
@@ -202,7 +194,7 @@ rbm <- function (x, num_hidden = 10, max_epochs = 1000, learning_rate = 0.1, use
   } else {
     output_x <- NULL
   }
-  out <- list(rotation=weights, activation_function=activation_function, x=output_x, error=error_stream, max_epochs=max_epochs, scaled = scaled)
+  out <- list(rotation=weights, activation_function=activation_function, x=output_x, error=error_stream, max_epochs=max_epochs, x_range = x_range, scaled=scaled)
   class(out) <- 'rbm'
   return(out)
 }
@@ -266,10 +258,8 @@ predict.rbm <- function (object, newdata, type='probs', omit_bias=TRUE, ...) {
     }
     #Scale if scaled during training
     if (!is.null(object$scaled)) {
-      for (i in 1:length(object$scaled$scaled)){
-        if (object$scaled$scaled[i] == 1){
-          newdata[,i] <- (newdata[,i] + abs(object$scaled$min[i]))/(abs(object$scaled$min[i]) + abs(object$scaled$max[i]))
-        }
+      if(object$scaled){
+        newdata <- (newdata - object$x_range[1]) / (object$x_range[2] - object$x_range[1])
       }
     }
     # Insert bias units of 1 into the first column.
