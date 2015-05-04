@@ -8,10 +8,29 @@ test_that("Stacked RBMs work correctly", {
     a = list(x=movie_reviews, layers=c(3, 3), verbose_stack = TRUE, max_epochs=10, use_mini_batches = TRUE, batch_size=1),
     a = list(x=movie_reviews, layers=c(3, 3), verbose_stack = FALSE, max_epochs=10, use_mini_batches = FALSE),
     a = list(x=movie_reviews, layers=c(3, 3), verbose_stack = FALSE, max_epochs=10, use_mini_batches = TRUE, batch_size=1),
-    a = list(x=george_reviews, layers=c(3, 3), verbose_stack = TRUE, max_epochs=10, use_mini_batches = FALSE),
-    a = list(x=george_reviews, layers=c(3, 3), verbose_stack = TRUE, max_epochs=10, use_mini_batches = TRUE, batch_size=1),
     a = list(x=george_reviews, layers=c(3, 3), verbose_stack = FALSE, max_epochs=10, use_mini_batches = FALSE),
-    a = list(x=george_reviews, layers=c(3, 3), verbose_stack = FALSE, max_epochs=10, use_mini_batches = TRUE, batch_size=1)
+    a = list(x=george_reviews, layers=c(3, 3), verbose_stack = FALSE, max_epochs=10, use_mini_batches = TRUE, batch_size=1),
+
+    a = list(x=movie_reviews, layers=c(3, 1), verbose_stack = FALSE, max_epochs=10, use_mini_batches = FALSE),
+    a = list(x=movie_reviews, layers=c(3, 1), verbose_stack = FALSE, max_epochs=10, use_mini_batches = TRUE, batch_size=1),
+    a = list(x=george_reviews, layers=c(3, 1), verbose_stack = FALSE, max_epochs=10, use_mini_batches = FALSE),
+    a = list(x=george_reviews, layers=c(3, 1), verbose_stack = FALSE, max_epochs=10, use_mini_batches = TRUE, batch_size=1),
+
+    a = list(x=movie_reviews, layers=c(1, 3), verbose_stack = FALSE, max_epochs=10, use_mini_batches = FALSE),
+    a = list(x=movie_reviews, layers=c(1, 3), verbose_stack = FALSE, max_epochs=10, use_mini_batches = TRUE, batch_size=1),
+    a = list(x=george_reviews, layers=c(1, 3), verbose_stack = FALSE, max_epochs=10, use_mini_batches = FALSE),
+    a = list(x=george_reviews, layers=c(1, 3), verbose_stack = FALSE, max_epochs=10, use_mini_batches = TRUE, batch_size=1),
+
+    a = list(x=movie_reviews, layers=c(1, 1), verbose_stack = FALSE, max_epochs=10, use_mini_batches = FALSE),
+    a = list(x=movie_reviews, layers=c(1, 1), verbose_stack = FALSE, max_epochs=10, use_mini_batches = TRUE, batch_size=1),
+    a = list(x=george_reviews, layers=c(1, 1), verbose_stack = FALSE, max_epochs=10, use_mini_batches = FALSE),
+    a = list(x=george_reviews, layers=c(1, 1), verbose_stack = FALSE, max_epochs=10, use_mini_batches = TRUE, batch_size=1),
+
+    a = list(x=movie_reviews, layers=c(5, 5, 5, 5), verbose_stack = FALSE, max_epochs=10, use_mini_batches = FALSE),
+    a = list(x=movie_reviews, layers=c(5, 5, 5, 5), verbose_stack = FALSE, max_epochs=10, use_mini_batches = TRUE, batch_size=1),
+    a = list(x=george_reviews, layers=c(5, 5, 5, 5), verbose_stack = FALSE, max_epochs=10, use_mini_batches = FALSE),
+    a = list(x=george_reviews, layers=c(5, 5, 5, 5), verbose_stack = FALSE, max_epochs=10, use_mini_batches = TRUE, batch_size=1)
+
   )){
     model <- do.call(stacked_rbm, args)
     rm(args)

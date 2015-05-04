@@ -59,7 +59,7 @@
 #' predict(PCA)
 #' predict(RBM, type='probs')
 #' }
-rbm_gpu <- function (x, num_hidden = 10, max_epochs = 1000, learning_rate = 0.1, use_mini_batches = FALSE, batch_size = 250, initial_weights_mean = 0, initial_weights_sd = 0.1, momentum = 0, dropout = FALSE, dropout_pct = .50, retx = FALSE, activation_function=NULL, verbose = FALSE, ...) {
+rbm_gpu <- function (x, num_hidden = 10, max_epochs = 1000, learning_rate = 0.1, use_mini_batches = TRUE, batch_size = 250, initial_weights_mean = 0, initial_weights_sd = 0.1, momentum = 0, dropout = FALSE, dropout_pct = .50, retx = FALSE, activation_function=NULL, verbose = FALSE, ...) {
 
   if(! require('gputools')){
     stop('The gputools package is required for this function.  Please install it, or us the "rbm" function instead (which does not require gputools)')
