@@ -9,6 +9,11 @@ env:
      - R_BUILD_ARGS=" "
      - R_CHECK_ARGS="--as-cran"
      - BOOTSTRAP_LATEX="1"
+     - export CUDA_HOME=/usr/local/cuda-7.0 
+     - export LD_LIBRARY_PATH=${CUDA_HOME}/lib64 
+     - PATH=${CUDA_HOME}/bin:${PATH}
+     - export PATH
+     
    matrix:
      - NOT_CRAN="true"
      - NOT_CRAN="false"
@@ -19,7 +24,11 @@ before_install:
   - ./travis-tool.sh bootstrap
 
 install:
+#http://www.r-tutor.com/gpu-computing/cuda-installation/cuda7.0-ubuntu
   - ./travis-tool.sh install_deps
+  - sudo dpkg -i cuda-repo-ubuntu1404_7.0-28_amd64.deb 
+  - sudo apt-get update
+  - ./travis-tool.sh aptget_install cuda
   - ./travis-tool.sh github_package jimhester/covr
   - ./travis-tool.sh github_package nullsatz/gputools
 
