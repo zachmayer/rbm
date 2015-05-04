@@ -18,22 +18,10 @@
 #' @examples
 #' #Setup a dataset
 #' set.seed(10)
-#' print('Data from: https://github.com/echen/restricted-boltzmann-machines')
-#' #Big SF/fantasy fan.
-#' Alice <- c('Harry_Potter' = 1, Avatar = 1, 'LOTR3' = 1, Gladiator = 0, Titanic = 0, Glitter = 0)
-#' #SF/fantasy fan, but doesn't like Avatar.
-#' Bob <- c('Harry_Potter' = 1, Avatar = 0, 'LOTR3' = 1, Gladiator = 0, Titanic = 0, Glitter = 0)
-#' #Big SF/fantasy fan.
-#' Carol <- c('Harry_Potter' = 1, Avatar = 1, 'LOTR3' = 1, Gladiator = 0, Titanic = 0, Glitter = 0)
-#' #Big Oscar winners fan.
-#' David <- c('Harry_Potter' = 0, Avatar = 0, 'LOTR3' = 1, Gladiator = 1, Titanic = 1, Glitter = 0)
-#' #Oscar winners fan, except for Titanic.
-#' Eric <- c('Harry_Potter' = 0, Avatar = 0, 'LOTR3' = 1, Gladiator = 1, Titanic = 0, Glitter = 0)
-#' #Big Oscar winners fan.
-#' Fred <- c('Harry_Potter' = 0, Avatar = 0, 'LOTR3' = 1, Gladiator = 1, Titanic = 1, Glitter = 0)
-#' dat <- rbind(Alice, Bob, Carol, David, Eric, Fred)
-#'
-#' Stacked_RBM <- stacked_rbm(dat, layers = c(3, 3), max_epochs=25)
+#' data(movie_reviews)
+#' data(george_reviews)
+#' Stacked_RBM <- stacked_rbm(movie_reviews, layers = c(3, 3), max_epochs=25)
+#' predict(Stacked_RBM, movie_reviews)
 stacked_rbm <- function (x, layers = c(30, 100, 30), learning_rate=0.1, verbose_stack=TRUE, use_gpu=FALSE, ...) {
   if(use_gpu){
     if(require('gputools')){

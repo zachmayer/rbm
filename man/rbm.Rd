@@ -53,35 +53,22 @@ This code is (mostly) adapted from edwin chen's python code for RBMs, avaiable h
 \examples{
 #Setup a dataset
 set.seed(10)
-print('Data from: https://github.com/echen/restricted-boltzmann-machines')
-#Big SF/fantasy fan.
-Alice <- c('Harry_Potter' = 1, Avatar = 1, 'LOTR3' = 1, Gladiator = 0, Titanic = 0, Glitter = 0)
-#SF/fantasy fan, but doesn't like Avatar.
-Bob <- c('Harry_Potter' = 1, Avatar = 0, 'LOTR3' = 1, Gladiator = 0, Titanic = 0, Glitter = 0)
-#Big SF/fantasy fan.
-Carol <- c('Harry_Potter' = 1, Avatar = 1, 'LOTR3' = 1, Gladiator = 0, Titanic = 0, Glitter = 0)
-#Big Oscar winners fan.
-David <- c('Harry_Potter' = 0, Avatar = 0, 'LOTR3' = 1, Gladiator = 1, Titanic = 1, Glitter = 0)
-#Oscar winners fan, except for Titanic.
-Eric <- c('Harry_Potter' = 0, Avatar = 0, 'LOTR3' = 1, Gladiator = 1, Titanic = 0, Glitter = 0)
-#Big Oscar winners fan.
-Fred <- c('Harry_Potter' = 0, Avatar = 0, 'LOTR3' = 1, Gladiator = 1, Titanic = 1, Glitter = 0)
-dat <- rbind(Alice, Bob, Carol, David, Eric, Fred)
+data(movie_reviews)
+data(george_reviews)
 
 #Fit a PCA model and an RBM model
-PCA <- prcomp(dat, retx=TRUE)
-RBM <- rbm(dat, retx=TRUE)
+PCA <- prcomp(movie_reviews, retx=TRUE)
+RBM <- rbm(movie_reviews, retx=TRUE)
 
 #Examine the 2 models
 round(PCA$rotation, 2) #PCA weights
 round(RBM$rotation, 2) #RBM weights
 
 #Predict for new data
-George <- as.matrix(t(c('Harry_Potter' = 0, Avatar = 0, 'LOTR3' = 0, Gladiator = 1, Titanic = 1, Glitter = 0)))
-predict(PCA, George)
-predict(RBM, George, type='activations')
-predict(RBM, George, type='probs')
-predict(RBM, George, type='states')
+predict(PCA, george_reviews)
+predict(RBM, george_reviews, type='activations')
+predict(RBM, george_reviews, type='probs')
+predict(RBM, george_reviews, type='states')
 
 #Predict for existing data
 predict(PCA)
