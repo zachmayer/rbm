@@ -22,7 +22,7 @@ before_install:
 #http://www.r-tutor.com/gpu-computing/cuda-installation/cuda7.0-ubuntu
   - curl -OL http://raw.github.com/craigcitro/r-travis/master/scripts/travis-tool.sh
   - chmod 755 ./travis-tool.sh
-  - ./travis-tool.sh dpkgcurl_install cuda-repo-ubuntu1404_7.0-28_amd64.deb 
+  - sudo dpkg -i -y cuda-repo-ubuntu1404_7.0-28_amd64.deb 
   - ./travis-tool.sh bootstrap
 
 install:
