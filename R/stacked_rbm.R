@@ -2,9 +2,14 @@
 #'
 #' @param x a sparse matrix
 #' @param layers an integer vector of the number of neurons in each RBM
+#' @param learning_rate The learning rate
+#' @param verbose_stack Print messages while training the stack
+#' @param use_gpu use rbm_gpu instead of rbm to train the rbm on a gpu
 #' @param ... passed to the rbm function
 #' @export
 #' @return a stacked_rbm object
+#' @importFrom Matrix Matrix cBind drop0
+#' @importMethodsFrom Matrix %*% crossprod tcrossprod
 #' @references
 #' \itemize{
 #' \item \url{http://blog.echen.me/2011/07/18/introduction-to-restricted-boltzmann-machines}
@@ -13,18 +18,22 @@
 #' #Setup a dataset
 #' set.seed(10)
 #' print('Data from: https://github.com/echen/restricted-boltzmann-machines')
-#' Alice <- c('Harry_Potter' = 1, Avatar = 1, 'LOTR3' = 1, Gladiator = 0, Titanic = 0, Glitter = 0) #Big SF/fantasy fan.
-#' Bob <- c('Harry_Potter' = 1, Avatar = 0, 'LOTR3' = 1, Gladiator = 0, Titanic = 0, Glitter = 0) #SF/fantasy fan, but doesn't like Avatar.
-#' Carol <- c('Harry_Potter' = 1, Avatar = 1, 'LOTR3' = 1, Gladiator = 0, Titanic = 0, Glitter = 0) #Big SF/fantasy fan.
-#' David <- c('Harry_Potter' = 0, Avatar = 0, 'LOTR3' = 1, Gladiator = 1, Titanic = 1, Glitter = 0) #Big Oscar winners fan.
-#' Eric <- c('Harry_Potter' = 0, Avatar = 0, 'LOTR3' = 1, Gladiator = 1, Titanic = 0, Glitter = 0) #Oscar winners fan, except for Titanic.
-#' Fred <- c('Harry_Potter' = 0, Avatar = 0, 'LOTR3' = 1, Gladiator = 1, Titanic = 1, Glitter = 0) #Big Oscar winners fan.
+#' #Big SF/fantasy fan.
+#' Alice <- c('Harry_Potter' = 1, Avatar = 1, 'LOTR3' = 1, Gladiator = 0, Titanic = 0, Glitter = 0)
+#' #SF/fantasy fan, but doesn't like Avatar.
+#' Bob <- c('Harry_Potter' = 1, Avatar = 0, 'LOTR3' = 1, Gladiator = 0, Titanic = 0, Glitter = 0)
+#' #Big SF/fantasy fan.
+#' Carol <- c('Harry_Potter' = 1, Avatar = 1, 'LOTR3' = 1, Gladiator = 0, Titanic = 0, Glitter = 0)
+#' #Big Oscar winners fan.
+#' David <- c('Harry_Potter' = 0, Avatar = 0, 'LOTR3' = 1, Gladiator = 1, Titanic = 1, Glitter = 0)
+#' #Oscar winners fan, except for Titanic.
+#' Eric <- c('Harry_Potter' = 0, Avatar = 0, 'LOTR3' = 1, Gladiator = 1, Titanic = 0, Glitter = 0)
+#' #Big Oscar winners fan.
+#' Fred <- c('Harry_Potter' = 0, Avatar = 0, 'LOTR3' = 1, Gladiator = 1, Titanic = 1, Glitter = 0)
 #' dat <- rbind(Alice, Bob, Carol, David, Eric, Fred)
 #'
 #' Stacked_RBM <- stacked_rbm(dat)
 stacked_rbm <- function (x, layers = c(30, 100, 30), learning_rate=0.1, verbose_stack=TRUE, use_gpu=FALSE, ...) {
-  stopifnot(require('Matrix'))
-
   if(use_gpu){
     if(require('gputools')){
       rbm <- rbm_gpu
@@ -81,14 +90,16 @@ stacked_rbm <- function (x, layers = c(30, 100, 30), learning_rate=0.1, verbose_
 #'
 #' This function takes a stacked RBM and a matrix of new data, and predicts for the new data with the RBM.
 #'
-#' @param x a RBM object
+#' @param object a RBM object
 #' @param newdata a sparse matrix of new data
 #' @param type a character vector specifying whether to return the hidden unit activations, hidden unit probs, or hidden unit states.  Activations or probabilities are typically the most useful if you wish to use the RBM features as input to another predictive model (or another RBM!).  Note that the hidden states are stochastic, and may be different each time you run the predict function, unless you set random.seed() before making predictions.  Activations and states are non-stochastic, and will be the same each time you run predict.
+#' @param omit_bias Don't return the bias column in the prediciton matrix.
 #' @param ... not used
 #' @export
 #' @return a sparse matrix
+#' @importFrom Matrix Matrix cBind drop0
+#' @importMethodsFrom Matrix %*% crossprod tcrossprod
 predict.stacked_rbm <- function (object, newdata, type='probs', omit_bias=TRUE, ...) {
-  stopifnot(require('Matrix'))
 
   #If no new data, just return predictions from the final rbm in the stack
   if (missing(newdata)) {
@@ -109,6 +120,7 @@ predict.stacked_rbm <- function (object, newdata, type='probs', omit_bias=TRUE, 
     return(hidden_states)
   } else{
     if(type=='probs'){return(hidden_probs)}
+    rows <- nrow(object$rotation) #Not sure about this one.  rows wasn't defined, so I'm trying to fix it
     hidden_states <- hidden_probs > Matrix(runif(rows*ncol(object$rotation)), nrow=rows, ncol=ncol(object$rotation))
     return(hidden_states)
   }
@@ -124,6 +136,8 @@ predict.stacked_rbm <- function (object, newdata, type='probs', omit_bias=TRUE, 
 #' @param ... not used
 #' @export
 #' @return a sparse matrix
+#' @importFrom Matrix Matrix cBind drop
+#' @importMethodsFrom Matrix %*% crossprod tcrossprod
 combine_weights.stacked_rbm <- function(x, layer=length(x$rbm_list)){
   x$rbm_list[[1]]$rotation %*% x$rbm_list[[2]]$rotation %*% x$rbm_list[[3]]$rotation
 }

@@ -16,20 +16,23 @@
 #'
 #' @param x a sparse matrix
 #' @param num_hidden number of neurons in the hidden layer
-#' @param max_epochs
-#' @param learning_rate
-#' @param use_mini_batches
-#' @param batch_size
-#' @param initial_weights_mean
-#' @param initial_weights_sd
-#' @param momentum
-#' @param dropout
+#' @param max_epochs Maximum learning epochs
+#' @param learning_rate Learning Rate
+#' @param use_mini_batches Use sub-samples for training for each iteration.  This usually results in MUCH faster learning.
+#' @param batch_size Sample size for mini batches
+#' @param initial_weights_mean Mean of initial random weights
+#' @param initial_weights_sd Standard deviation of initial random weights
+#' @param momentum Use momentum when learning.  (Helps move faster through "half pipe" shaped regions).
+#' @param dropout Use dropout when learning (sort of a form of regularization).
+#' @param dropout_pct What percent of neurons to drop out (0 to 1)
 #' @param retx whether to return the RBM predictions for the input data
-#' @param verbose
+#' @param verbose Print lots of messages while training
 #' @param activation_function function to convert hidden activations (-Inf, Inf) to hidden probabilities [0, 1].  Must be able to operate on sparse "Matrix" objects.
 #' @param ... not used
 #' @export
 #' @return a rbm object
+#' @importFrom Matrix Matrix cBind drop0
+#' @importMethodsFrom Matrix %*% crossprod tcrossprod
 #' @references
 #' \itemize{
 #' \item \url{http://blog.echen.me/2011/07/18/introduction-to-restricted-boltzmann-machines}
@@ -77,7 +80,6 @@
 #' predict(PCA)
 #' predict(RBM, type='probs')
 rbm <- function (x, num_hidden = 10, max_epochs = 1000, learning_rate = 0.1, use_mini_batches = FALSE, batch_size = 250, initial_weights_mean = 0, initial_weights_sd = 0.1, momentum = 0, dropout = FALSE, dropout_pct = .50, retx = FALSE, activation_function=NULL, verbose = FALSE, ...) {
-  stopifnot(require('Matrix'))
 
   #Checks
   stopifnot(length(dim(x)) == 2)
@@ -99,7 +101,7 @@ rbm <- function (x, num_hidden = 10, max_epochs = 1000, learning_rate = 0.1, use
 
   if (max(x) > 1 | min(x) <0){
     warning("x is out of bounds, automatically scaling to 0-1, test data will be scaled as well")
-    scaled <- {}
+    scaled <- list()
     scaled$min <- apply(x, 2, min)
     scaled$max <- apply(x, 2, max)
     scaled$scaled <- apply(x, 2, function(x) ifelse (max(x) > 1 | min(x) < 0, 1, 0))
@@ -111,9 +113,8 @@ rbm <- function (x, num_hidden = 10, max_epochs = 1000, learning_rate = 0.1, use
       return (x)
     })
   } else{
-    scaled <- {}
+    scaled <- list()
   }
-
 
   stopifnot(is.numeric(momentum))
   stopifnot(momentum >= 0 & momentum <=1)
@@ -170,11 +171,11 @@ rbm <- function (x, num_hidden = 10, max_epochs = 1000, learning_rate = 0.1, use
     # Note that we're using the activation *probabilities* of the hidden states, not the hidden states
     # themselves, when computing associations. We could also use the states; see section 3 of Hinton's
     # "A Practical Guide to Training Restricted Boltzmann Machines" for more.
-    pos_associations = Matrix:::crossprod(x_sample, pos_hidden_probs)
+    pos_associations = crossprod(x_sample, pos_hidden_probs)
 
     # Reconstruct the visible units and sample again from the hidden units.
     # (This is the "negative CD phase", aka the daydreaming phase.)
-    neg_visible_activations = Matrix:::tcrossprod(pos_hidden_states, weights)
+    neg_visible_activations = tcrossprod(pos_hidden_states, weights)
     neg_visible_probs = activation_function(neg_visible_activations)
     neg_visible_probs[,1] = 1 # Fix the bias unit.
     neg_hidden_activations = neg_visible_probs %*% weights
@@ -182,7 +183,7 @@ rbm <- function (x, num_hidden = 10, max_epochs = 1000, learning_rate = 0.1, use
 
     # Note, again, that we're using the activation *probabilities* when computing associations, not the states
     # themselves.
-    neg_associations = Matrix:::crossprod(neg_visible_probs, neg_hidden_probs)
+    neg_associations = crossprod(neg_visible_probs, neg_hidden_probs)
 
     # Update weights
     weights = weights + learning_rate * ((pos_associations - neg_associations) / nrow(x_sample))
@@ -231,14 +232,16 @@ plot.rbm <- function (x, ...) {
 #' Predict from a Restricted Boltzmann Machine
 #'
 #' This function takes an RBM and a matrix of new data, and predicts for the new data with the RBM.
-#' @param x a RBM object
+#' @param object a RBM object
 #' @param newdata a sparse matrix of new data
 #' @param type a character vector specifying whether to return the hidden unit activations, hidden unit probs, or hidden unit states.  Activations or probabilities are typically the most useful if you wish to use the RBM features as input to another predictive model (or another RBM!).  Note that the hidden states are stochastic, and may be different each time you run the predict function, unless you set random.seed() before making predictions.  Activations and states are non-stochastic, and will be the same each time you run predict.
+#' @param omit_bias Don't return the bias column in the prediciton matrix.
 #' @param ... not used
 #' @export
 #' @return a sparse matrix
+#' @importFrom Matrix Matrix cBind drop0
+#' @importMethodsFrom Matrix %*% crossprod tcrossprod
 predict.rbm <- function (object, newdata, type='probs', omit_bias=TRUE, ...) {
-  stopifnot(require('Matrix'))
   if (missing(newdata)) {
     if (!is.null(object$x)) {
       hidden_activations <- object$x
