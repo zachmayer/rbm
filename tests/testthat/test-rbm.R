@@ -1,4 +1,4 @@
-test_that("The universe still works", {
+test_that("Single RBMs work correctly", {
 
   data("movie_reviews")
   data("george_reviews")
@@ -8,12 +8,34 @@ test_that("The universe still works", {
     a = list(x=movie_reviews, num_hidden=3, max_epochs=10, use_mini_batches = FALSE, retx=FALSE, verbose=TRUE),
     a = list(x=movie_reviews, num_hidden=3, max_epochs=10, use_mini_batches = FALSE, retx=TRUE, verbose=FALSE),
     a = list(x=movie_reviews, num_hidden=3, max_epochs=10, use_mini_batches = FALSE, retx=TRUE, verbose=TRUE),
-
     a = list(x=movie_reviews, num_hidden=3, max_epochs=10, use_mini_batches = TRUE, retx=FALSE, verbose=FALSE, batch_size=1),
     a = list(x=movie_reviews, num_hidden=3, max_epochs=10, use_mini_batches = TRUE, retx=FALSE, verbose=TRUE, batch_size=1),
     a = list(x=movie_reviews, num_hidden=3, max_epochs=10, use_mini_batches = TRUE, retx=TRUE, verbose=FALSE, batch_size=1),
-    a = list(x=movie_reviews, num_hidden=3, max_epochs=10, use_mini_batches = TRUE, retx=TRUE, verbose=TRUE, batch_size=1)
-
+    a = list(x=movie_reviews, num_hidden=3, max_epochs=10, use_mini_batches = TRUE, retx=TRUE, verbose=TRUE, batch_size=1),
+    a = list(x=movie_reviews, num_hidden=3, max_epochs=10, use_mini_batches = FALSE, retx=FALSE, verbose=FALSE),
+    a = list(x=george_reviews, num_hidden=3, max_epochs=10, use_mini_batches = FALSE, retx=FALSE, verbose=TRUE),
+    a = list(x=george_reviews, num_hidden=3, max_epochs=10, use_mini_batches = FALSE, retx=TRUE, verbose=FALSE),
+    a = list(x=george_reviews, num_hidden=3, max_epochs=10, use_mini_batches = FALSE, retx=TRUE, verbose=TRUE),
+    a = list(x=george_reviews, num_hidden=3, max_epochs=10, use_mini_batches = TRUE, retx=FALSE, verbose=FALSE, batch_size=1),
+    a = list(x=george_reviews, num_hidden=3, max_epochs=10, use_mini_batches = TRUE, retx=FALSE, verbose=TRUE, batch_size=1),
+    a = list(x=george_reviews, num_hidden=3, max_epochs=10, use_mini_batches = TRUE, retx=TRUE, verbose=FALSE, batch_size=1),
+    a = list(x=george_reviews, num_hidden=3, max_epochs=10, use_mini_batches = TRUE, retx=TRUE, verbose=TRUE, batch_size=1),
+    a = list(x=movie_reviews, num_hidden=1, max_epochs=10, use_mini_batches = FALSE, retx=FALSE, verbose=FALSE),
+    a = list(x=movie_reviews, num_hidden=1, max_epochs=10, use_mini_batches = FALSE, retx=FALSE, verbose=TRUE),
+    a = list(x=movie_reviews, num_hidden=1, max_epochs=10, use_mini_batches = FALSE, retx=TRUE, verbose=FALSE),
+    a = list(x=movie_reviews, num_hidden=1, max_epochs=10, use_mini_batches = FALSE, retx=TRUE, verbose=TRUE),
+    a = list(x=movie_reviews, num_hidden=1, max_epochs=10, use_mini_batches = TRUE, retx=FALSE, verbose=FALSE, batch_size=1),
+    a = list(x=movie_reviews, num_hidden=1, max_epochs=10, use_mini_batches = TRUE, retx=FALSE, verbose=TRUE, batch_size=1),
+    a = list(x=movie_reviews, num_hidden=1, max_epochs=10, use_mini_batches = TRUE, retx=TRUE, verbose=FALSE, batch_size=1),
+    a = list(x=movie_reviews, num_hidden=1, max_epochs=10, use_mini_batches = TRUE, retx=TRUE, verbose=TRUE, batch_size=1),
+    a = list(x=movie_reviews, num_hidden=1, max_epochs=10, use_mini_batches = FALSE, retx=FALSE, verbose=FALSE),
+    a = list(x=george_reviews, num_hidden=1, max_epochs=10, use_mini_batches = FALSE, retx=FALSE, verbose=TRUE),
+    a = list(x=george_reviews, num_hidden=1, max_epochs=10, use_mini_batches = FALSE, retx=TRUE, verbose=FALSE),
+    a = list(x=george_reviews, num_hidden=1, max_epochs=10, use_mini_batches = FALSE, retx=TRUE, verbose=TRUE),
+    a = list(x=george_reviews, num_hidden=1, max_epochs=10, use_mini_batches = TRUE, retx=FALSE, verbose=FALSE, batch_size=1),
+    a = list(x=george_reviews, num_hidden=1, max_epochs=10, use_mini_batches = TRUE, retx=FALSE, verbose=TRUE, batch_size=1),
+    a = list(x=george_reviews, num_hidden=1, max_epochs=10, use_mini_batches = TRUE, retx=TRUE, verbose=FALSE, batch_size=1),
+    a = list(x=george_reviews, num_hidden=1, max_epochs=10, use_mini_batches = TRUE, retx=TRUE, verbose=TRUE, batch_size=1)
   )){
     model <- do.call(rbm, args)
 
