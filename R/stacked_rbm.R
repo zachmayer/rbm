@@ -8,6 +8,7 @@
 #' @param ... passed to the rbm function
 #' @export
 #' @return a stacked_rbm object
+#' @import methods
 #' @importFrom Matrix Matrix cBind drop0
 #' @importMethodsFrom Matrix %*% crossprod tcrossprod
 #' @references
@@ -105,6 +106,7 @@ stacked_rbm <- function (x, layers = c(30, 100, 30), learning_rate=0.1, verbose_
 #' @param ... not used
 #' @export
 #' @return a sparse matrix
+#' @import methods
 #' @importFrom Matrix Matrix cBind drop0
 #' @importMethodsFrom Matrix %*% crossprod tcrossprod
 predict.stacked_rbm <- function (object, newdata, type='probs', omit_bias=TRUE, ...) {

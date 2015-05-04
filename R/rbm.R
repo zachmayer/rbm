@@ -31,6 +31,7 @@
 #' @param ... not used
 #' @export
 #' @return a rbm object
+#' @import methods
 #' @importFrom Matrix Matrix cBind drop0
 #' @importMethodsFrom Matrix %*% crossprod tcrossprod
 #' @references
@@ -230,6 +231,7 @@ plot.rbm <- function (x, ...) {
 #' @param ... not used
 #' @export
 #' @return a sparse matrix
+#' @import methods
 #' @importFrom Matrix Matrix cBind drop0
 #' @importMethodsFrom Matrix %*% crossprod tcrossprod
 predict.rbm <- function (object, newdata, type='probs', omit_bias=TRUE, ...) {
