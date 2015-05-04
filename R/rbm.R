@@ -259,7 +259,7 @@ predict.rbm <- function (object, newdata, type='probs', omit_bias=TRUE, ...) {
     if (!is.null(object$scaled)) {
       for (i in 1:length(object$scaled$scaled)){
         if (scaled$scaled[i] == 1){
-          newdata[,i] <- (newdata[,i] + abs(object$scaled$min[i]))/(abs(object$scaled$min[i]) + abs(object$scaled$max[i]))
+          newdata[,i] <- (newdata[,i] * (abs(object$scaled$min[i]) + abs(object$scaled$max[i])) - abs(object$scaled$min[i])
         }
       }
     }
