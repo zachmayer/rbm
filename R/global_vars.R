@@ -1,0 +1,1 @@
+utils::globalVariables(c("gpuMatMult", "gpuCrossprod", "gpuTcrossprod"))
